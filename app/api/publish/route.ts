@@ -44,8 +44,30 @@ export async function POST(request: Request) {
       return Response.json({ error: "Invalid path" }, { status: 400 });
     }
 
+    if (state.path !== path) {
+      return Response.json({ error: "Path does not match state" }, { status: 400 });
+    }
+
     const slotContent = slotContentFromState(state);
     const title = titleFromSlot1(state);
+
+    if (title.trim() === "" || formattedDocument.trim() === "") {
+      return Response.json(
+        { error: "Title and formatted document are required" },
+        { status: 400 }
+      );
+    }
+
+    const allSlotsFilled = (
+      ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7"] as const
+    ).every((key) => (state.slots[key].content ?? "").trim() !== "");
+    if (!allSlotsFilled) {
+      return Response.json(
+        { error: "All slots must be filled before publishing" },
+        { status: 400 }
+      );
+    }
+
     const likelihoodScore = 0; // placeholder until v2
 
     const draftId = await publishDraft(

@@ -1,3 +1,6 @@
+/**
+ * Server-only. Do not import from client code. ANTHROPIC_API_KEY must stay on the server.
+ */
 import Anthropic from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic({

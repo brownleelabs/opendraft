@@ -25,6 +25,12 @@ function getClient(): SupabaseClient {
   return _client;
 }
 
+function assertValidSessionId(sessionId: string): void {
+  if (!sessionId || typeof sessionId !== "string" || sessionId.trim() === "") {
+    throw new Error("session_id is required");
+  }
+}
+
 /**
  * Save or update a conversation session (upsert by session_id).
  */
@@ -34,14 +40,9 @@ export async function saveConversation(
   messageHistory: ConversationMessage[],
   path: string | null
 ): Promise<void> {
+  assertValidSessionId(sessionId);
   try {
     const supabase = getClient();
-    const { data: existing } = await supabase
-      .from("conversations")
-      .select("id")
-      .eq("session_id", sessionId)
-      .maybeSingle();
-
     const row = {
       session_id: sessionId,
       goal_tree_state: goalTreeState as unknown as Record<string, unknown>,
@@ -49,17 +50,10 @@ export async function saveConversation(
       path,
       updated_at: new Date().toISOString(),
     };
-
-    if (existing?.id) {
-      const { error } = await supabase
-        .from("conversations")
-        .update(row)
-        .eq("id", existing.id);
-      if (error) throw new Error(`saveConversation update failed: ${error.message}`);
-    } else {
-      const { error } = await supabase.from("conversations").insert(row);
-      if (error) throw new Error(`saveConversation insert failed: ${error.message}`);
-    }
+    const { error } = await supabase
+      .from("conversations")
+      .upsert(row, { onConflict: "session_id" });
+    if (error) throw new Error(`saveConversation upsert failed: ${error.message}`);
   } catch (err) {
     const message = err instanceof Error ? err.message : "saveConversation failed";
     throw new Error(message);
@@ -111,22 +105,23 @@ export async function fetchDrafts(): Promise<Draft[]> {
     const { data, error } = await supabase
       .from("drafts")
       .select("id, path, title, formatted_document, likelihood_score, published_at")
-      .order("published_at", { ascending: false });
+      .order("published_at", { ascending: false })
+      .limit(100);
 
     if (error) throw new Error(`fetchDrafts failed: ${error.message}`);
     const rows = (data ?? []) as Array<{
       id: string;
       path: string;
-      title: string;
-      formatted_document: string;
+      title: string | null;
+      formatted_document: string | null;
       likelihood_score: number;
       published_at: string;
     }>;
     return rows.map((r) => ({
       id: r.id,
       path: r.path,
-      title: r.title,
-      formatted_document: r.formatted_document,
+      title: r.title ?? "",
+      formatted_document: r.formatted_document ?? "",
       likelihood_score: r.likelihood_score,
       published_at: r.published_at,
     }));
@@ -150,17 +145,10 @@ export async function logEvent(
     metadata?: Record<string, unknown>;
   }
 ): Promise<void> {
-  getClient()
-    .from("events")
-    .insert({
-      session_id: sessionId,
-      event_type: eventType,
-      path: options?.path ?? null,
-      slot_number: options?.slotNumber ?? null,
-      persona: options?.persona ?? null,
-      metadata: options?.metadata ?? null,
-    })
-    .then(({ error }) => {
-      if (error) console.error("Event log failed:", error);
-    });
+  assertValidSessionId(sessionId);
+  fetch("/api/log-event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId, eventType, options }),
+  }).catch((err) => console.error("Event log failed:", err));
 }
