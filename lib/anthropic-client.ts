@@ -1,0 +1,74 @@
+import Anthropic from "@anthropic-ai/sdk";
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+export class AnthropicApiError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AnthropicApiError";
+  }
+}
+
+/**
+ * Main conversation turn. Uses claude-sonnet-4-6 with prompt caching.
+ */
+export async function conversationCall(
+  messages: { role: "user" | "assistant"; content: string }[],
+  systemPrompt: string
+): Promise<string> {
+  try {
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      cache_control: { type: "ephemeral" },
+      system: systemPrompt,
+      messages: messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      })),
+    });
+
+    for (const block of response.content) {
+      if (block.type === "text") {
+        return block.text;
+      }
+    }
+    throw new AnthropicApiError("No text block in response");
+  } catch (err) {
+    if (err instanceof AnthropicApiError) throw err;
+    const message =
+      err instanceof Error ? err.message : "Anthropic API request failed";
+    throw new AnthropicApiError(message);
+  }
+}
+
+/**
+ * Fast classification (slot detection, path routing). Uses claude-haiku-4-5-20251001.
+ */
+export async function classifyCall(
+  content: string,
+  instruction: string
+): Promise<string> {
+  try {
+    const response = await anthropic.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 1000,
+      system: instruction,
+      messages: [{ role: "user", content }],
+    });
+
+    for (const block of response.content) {
+      if (block.type === "text") {
+        return block.text.trim();
+      }
+    }
+    throw new AnthropicApiError("No text block in response");
+  } catch (err) {
+    if (err instanceof AnthropicApiError) throw err;
+    const message =
+      err instanceof Error ? err.message : "Anthropic API request failed";
+    throw new AnthropicApiError(message);
+  }
+}

@@ -1,0 +1,436 @@
+# OpenDraft — Cursor Rules
+# opendraft.dev — AI-guided civic drafting platform
+# Read CLAUDE.md at project root before every session. It is the single source of truth.
+
+---
+
+## PROJECT IDENTITY
+
+OpenDraft helps regular citizens turn raw ideas into structured draft documents — either a bill proposal or a product proposal — through AI-guided Socratic questioning. The AI never generates ideas. It asks questions until the user has articulated their own idea clearly enough to populate a structured output. The document builds live on screen as the conversation progresses. When all 7 slots are filled, the draft publishes to a public feed and is manually routed by the OpenDraft team to the correct policymaker or product team.
+
+**This is not a chatbot. It is a civic drafting tool. It is free to use, privately owned, and self-funded.**
+
+When making any architectural or design decision ask: does this help a regular person make their idea legible to an institution? If not, do not build it.
+
+---
+
+## CORE RULES — NEVER VIOLATE
+
+1. **Mobile first. Always.** Default styles are 390px. Layer desktop on top with `md:` prefix. Never write desktop styles first.
+
+2. **No inline styles. Ever.** All styling through Tailwind utility classes only.
+
+3. **No fixed pixel widths.** Tailwind spacing scale, percentages, or viewport units only. Never `w-[347px]`.
+
+4. **Every UI element is a named component.** No anonymous JSX blocks in pages. If it renders, it gets a file.
+
+5. **One component per file.** No combining unrelated components.
+
+6. **State lives in code. Logic lives in system prompt.** Never put conversation flow logic inside UI components. Components render. `/lib` handles logic.
+
+7. **No API calls from components.** All Anthropic and Supabase calls go through `/lib`. Components call lib functions. Never directly.
+
+8. **The Paper container never grows.** Fixed height. Internal scroll only. `overflow-y: scroll` inside, not outside. Non-negotiable.
+
+9. **The AI response always has exactly two parts.** Understood + Question. The component enforces this structurally — it does not render one without the other.
+
+10. **Never generate the draft until all 7 slots are confirmed.** Not 6. Not "mostly filled." All 7. Both paths.
+
+11. **Test mobile before desktop.** Chrome DevTools 390px before 1280px. Every time.
+
+12. **TypeScript strict mode. No `any`.** Define the type. Do not suppress errors.
+
+13. **Never contradict CLAUDE.md.** If this file and CLAUDE.md conflict, CLAUDE.md wins.
+
+---
+
+## STACK
+
+| Layer | Choice |
+|---|---|
+| Framework | Next.js App Router |
+| Language | TypeScript — strict mode |
+| Styling | Tailwind CSS only — no CSS modules, no styled-components |
+| Components | shadcn/ui — pre-selected, do not build from scratch |
+| Database | Supabase (PostgreSQL) |
+| AI — Main | claude-sonnet-4-6 |
+| AI — Fast | claude-haiku-4-5-20251001 |
+| Deployment | Vercel |
+| Package manager | npm |
+
+---
+
+## FILE STRUCTURE
+
+```
+/app
+  /page.tsx                      — Screen 1 (Home Feed)
+  /draft/page.tsx                — Screens 2-3 (Initiation + Active Conversation)
+  /feed/page.tsx                 — Screen 4 (Public Feed)
+  /api/conversation/route.ts     — Anthropic API endpoint (Sonnet)
+  /api/classify/route.ts         — Anthropic API endpoint (Haiku — routing/validation)
+  /api/publish/route.ts          — Supabase publish endpoint
+
+/components
+  /shell
+    AppShell.tsx
+    TopNav.tsx
+    BottomNav.tsx                — Two variants via prop: 'default' | 'active'
+    PaginationDots.tsx
+  /paper
+    Paper.tsx                    — Fixed container, never grows
+    PaperScrollContainer.tsx     — Internal scroll, auto-scroll to bottom
+    PaperLines.tsx               — Ruled lines for empty state
+    PaperOnboardingCopy.tsx      — Static copy on Screen 2
+    LiveDraftContent.tsx         — Live document, both paths
+  /conversation
+    AIResponseBlock.tsx          — "Understood: / Question:" always two parts
+    InputField.tsx               — Textarea + send, two states
+  /toolbar
+    Toolbar.tsx
+    LikelihoodBadge.tsx
+    ExpertButton.tsx             — v1.5 — icon present, functionality deferred
+    MemoryButton.tsx
+    ProgressButton.tsx
+  /modals
+    InfoModal.tsx
+    GoalTreeModal.tsx
+    ProgressChartModal.tsx
+    LikelihoodDetailPanel.tsx
+    ExpertPanel.tsx              — v1.5
+  /output
+    DraftDocument.tsx
+    PolicyDraftTemplate.tsx      — Legislative Launchpad
+    ProductDraftTemplate.tsx     — Silicon Valley Handoff
+    PublishButton.tsx
+  /feed
+    PublicFeedScreen.tsx
+    DraftCard.tsx
+    CategoryTag.tsx
+    VoteButtons.tsx
+  /drafts
+    PreviousDraftsScreen.tsx
+    DraftResume.tsx
+
+/lib
+  anthropic-client.ts            — All Anthropic calls go here. Never called from components directly.
+  system-prompt.ts               — System prompt as structured string with interpolated variables
+  supabase-client.ts             — All Supabase calls go here. Never called from components directly.
+  conversation-engine.ts         — The orchestration pipeline — 9 steps per message
+  slot-tracker.ts                — useSlotTracker hook
+
+/types
+  index.ts                       — GoalTreeState, SlotStatus, all shared types
+```
+
+---
+
+## CONVERSATION ENGINE — PIPELINE
+
+Every user message passes through these steps in order. Never skip.
+
+```
+1. Input validation          — Haiku
+2. State check               — Which phase, which slots filled
+3. Slot update detection     — Does this message fill or advance a slot — Haiku
+4. Existence check           — Runs when Slot 6 fires (policy) or Slots 4-5 fire (product)
+5. Coherence check           — Do all slots still fit together logically
+6. Path routing              — Haiku, Level 2 only
+7. Question selection        — Which question type is needed now
+8. Main LLM call             — Sonnet
+9. Output validation         — Exactly one question returned, no premature synthesis
+```
+
+---
+
+## CONVERSATION PHASES
+
+Four phases. Move in order. Never skip. Never advance without gate condition met.
+
+| Phase | Goal | Gate |
+|---|---|---|
+| 1 — Problem Definition | Extract one clean, specific problem statement | User confirms the problem |
+| 2 — Path Routing | Policy or Product | User confirms the path |
+| 3 — Structured Interrogation | Fill all 7 slots | All 7 slots filled and confirmed |
+| 4 — Synthesis | Generate draft from slot content | User confirms "Does this capture what you meant?" |
+
+---
+
+## SLOT STRUCTURE — BOTH PATHS
+
+**Policy Path — 7 Slots (Legislative Launchpad)**
+```
+Slot 1: Specific Harm — who, how, scale
+Slot 2: The Gap and Consequences — why current law fails, stakes of inaction
+Slot 3: Proposed Mechanism — operative clause (verb + noun), key provisions
+Slot 4: Enforcement — who enforces, what enforcement looks like in practice
+Slot 5: Jurisdiction — federal/state/local, why that level
+Slot 6: Precedent and Fiscal Note — existing models, cost
+Slot 7: Political Landscape — real opposition + named supporters (both required)
+```
+
+**Product Path — 7 Slots (Silicon Valley Handoff)**
+```
+Slot 1: User Pain and Evidence — friction + data grounding it
+Slot 2: User Story and Happy Path — standard format + ideal flow
+Slot 3: Specific Feature — P0 in one sentence, P1 considerations
+Slot 4: Target Company and Success Metric — who and what number goes up
+Slot 5: Existing Landscape — competitors, prior requests, current workaround
+Slot 6: Value Proposition and OKR Alignment — business case + company objectives
+Slot 7: Risks and Non-Goals — real risks named, scope explicitly bounded
+```
+
+---
+
+## GOALTREESTATE — TYPESCRIPT INTERFACE
+
+```typescript
+interface GoalTreeState {
+  phase: 1 | 2 | 3 | 4;
+  path: 'policy' | 'product' | 'unrouted';
+  slots: {
+    slot1: SlotStatus;
+    slot2: SlotStatus;
+    slot3: SlotStatus;
+    slot4: SlotStatus;
+    slot5: SlotStatus;
+    slot6: SlotStatus;
+    slot7: SlotStatus;
+  };
+  existenceCheck: {
+    status: 'pending' | 'clear' | 'identical' | 'precedent' | 'failed_attempt' | 'competitor_only';
+    detail: string | null;
+    requiresUserResponse: boolean;
+  };
+  lastUnderstood: string;
+  nextQuestion: string;
+}
+
+type SlotStatus = {
+  status: 'empty' | 'partial' | 'filled';
+  content: string | null;
+}
+```
+
+---
+
+## EXISTENCE CHECK — CRITICAL LOGIC
+
+When the existence check fires it does not silently decrease the score. It surfaces the finding explicitly and requires a user response before the conversation continues. `requiresUserResponse: true` blocks synthesis until the user addresses it.
+
+| Scenario | AI Response | Score Impact |
+|---|---|---|
+| Identical law in same jurisdiction | Surface it. User must articulate what's different or stop. | Major decrease |
+| Similar law exists elsewhere | Surface as positive precedent. Auto-populate Slot 6. | Increase |
+| Prior bill failed | Surface failure + reason. User must explain why this attempt succeeds. | Moderate decrease until addressed |
+| Feature exists in target company's product | Surface it. User must redirect or articulate improvement. | Major decrease |
+| Feature exists at competitor only | Surface as competitive leverage. Auto-populate Slot 5. | Increase |
+
+**Nothing is silent.**
+
+---
+
+## AI RESPONSE FORMAT
+
+During Phases 1, 2, and 3 every response follows this structure. No exceptions.
+
+```
+Understood: [One sentence reflecting exactly what the user said — specific, not paraphrased]
+Question: "[One question. Never two. Ends with a question mark.]"
+```
+
+The AIResponseBlock component enforces this structurally. It does not render without both parts.
+
+---
+
+## ANTHROPIC API PATTERN
+
+```typescript
+// lib/anthropic-client.ts
+import Anthropic from '@anthropic-ai/sdk';
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY
+});
+
+// Main conversation — Sonnet with prompt caching
+export async function conversationCall(
+  messages: { role: 'user' | 'assistant'; content: string }[],
+  systemPrompt: string
+): Promise<string> {
+  const response = await anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1000,
+    system: [
+      {
+        type: 'text',
+        text: systemPrompt,
+        cache_control: { type: 'ephemeral' }  // Prompt caching — required
+      }
+    ],
+    messages
+  });
+  return response.content[0].type === 'text' ? response.content[0].text : '';
+}
+
+// Classification — Haiku, fast and cheap
+export async function classifyCall(
+  content: string,
+  instruction: string
+): Promise<string> {
+  const response = await anthropic.messages.create({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 100,
+    system: instruction,
+    messages: [{ role: 'user', content }]
+  });
+  return response.content[0].type === 'text' ? response.content[0].text.trim() : '';
+}
+```
+
+**Prompt caching is required from day one.** The system prompt is ~4,000 tokens. Without caching that is 4,000 tokens × every message × every user. Enable it on first API call, not as an optimization later.
+
+---
+
+## SUPABASE SCHEMA
+
+```sql
+-- Session state and full conversation history
+conversations (
+  id uuid primary key default gen_random_uuid(),
+  session_id text not null,
+  goal_tree_state jsonb not null,
+  message_history jsonb not null,
+  path text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- Completed published documents
+drafts (
+  id uuid primary key default gen_random_uuid(),
+  session_id text not null,
+  path text not null,
+  title text not null,
+  slot_content jsonb not null,
+  formatted_document text not null,
+  likelihood_score integer,
+  existence_check_status text,
+  published_at timestamptz default now()
+);
+
+-- Upvote and downvote records
+votes (
+  id uuid primary key default gen_random_uuid(),
+  draft_id uuid references drafts(id),
+  device_fingerprint text not null,
+  value integer not null,
+  created_at timestamptz default now(),
+  unique(draft_id, device_fingerprint)
+);
+```
+
+---
+
+## DESIGN SYSTEM
+
+**Color palette:**
+```
+Navy:          #1B2A4A  — primary, TopNav, headings
+Forest Green:  #2D5016  — input border/label, Product category tag
+Cream:         #FAF8F3  — app background
+White:         #FFFFFF  — paper surface, card surface
+Near-black:    #1A1A1A  — body text
+Light gray:    #E5E5E5  — borders, dividers
+```
+
+**Typography:**
+- Headings: Playfair Display (serif — civic gravitas)
+- Body: Inter (neutral, readable)
+- Paper content: Playfair Display (the document must feel like a real document)
+
+**shadcn components — already installed. Do not reinstall:**
+`scroll-area` `textarea` `card` `badge` `button` `skeleton` `sonner` `tooltip` `sheet`
+
+**Required:** `TooltipProvider` must wrap the app in `app/layout.tsx`. Import from `@/components/ui/tooltip`.
+
+| shadcn Component | Used For |
+|---|---|
+| ScrollArea | PaperScrollContainer |
+| Textarea | InputField |
+| Card | DraftCard in public feed |
+| Badge | LikelihoodBadge, CategoryTag |
+| Button | CREATE A DRAFT, PublishButton |
+| Skeleton | Paper loading state while AI responds |
+| Sonner | Toast on slot confirmed, draft published |
+| Tooltip | Toolbar icon labels on long press |
+| Sheet | GoalTreeModal, ProgressChartModal on mobile |
+
+---
+
+## TAILWIND RESPONSIVE PATTERNS
+
+```tsx
+// Standard container
+<div className="w-full max-w-2xl mx-auto px-4 md:px-8">
+
+// Mobile stack → Desktop side by side
+<div className="flex flex-col md:flex-row gap-4">
+
+// Mobile only
+<div className="block md:hidden">
+
+// Desktop only
+<div className="hidden md:block">
+
+// Fixed bottom input — mobile keyboard-safe
+<div className="fixed bottom-0 left-0 right-0 md:relative md:bottom-auto p-4 bg-white border-t md:border-0">
+```
+
+---
+
+## ENVIRONMENT VARIABLES
+
+```bash
+ANTHROPIC_API_KEY=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_APP_URL=https://opendraft.dev
+```
+
+---
+
+## SPRINT GATES
+
+| Gate | Condition |
+|---|---|
+| Gate 1 | Complete GROW conversation reaches synthesis on mobile at 390px |
+| Gate 2 | 40 of 50 test inputs produce good questions. 90%+ routing accuracy. |
+| Gate 3 | Draft renders correctly for both paths on both screen sizes |
+| Gate 4 | Publish → feed → upvote working. Deployed to opendraft.dev. |
+
+---
+
+## WHAT NOT TO BUILD IN V1
+
+Do not build these regardless of how good they sound in the moment.
+
+- ❌ ExpertPanel functionality (LegiScan + CongressMCP) — icon present, functionality is v1.5
+- ❌ Authentication and user accounts — anonymous sessions only
+- ❌ Author attribution on drafts — v1.5
+- ❌ Viability score algorithm — placeholder percentage, real algorithm is v2
+- ❌ Prediction markets
+- ❌ Automated contact routing — manual routing by Andrew is v1. Automation is v2.
+- ❌ Institutional accounts for policymakers/product teams — v1.5 goal
+- ❌ Comments on drafts
+- ❌ Mobile app
+
+**v1 is:** Conversation → 7 slots → Draft → Publish → Manual routing by admin → Feed → Upvote → Vote threshold re-send. Nothing else.
+
+---
+
+*OpenDraft — opendraft.dev*
+*Owner: Andrew Brownlee / Offbeat Options LLC*
+*Last updated: March 8, 2026*
+*Source of truth: CLAUDE.md*
