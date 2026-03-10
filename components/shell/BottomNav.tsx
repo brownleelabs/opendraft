@@ -12,7 +12,7 @@ interface BottomNavProps {
 
 const iconClassName = "size-6 text-[#1B2A4A]";
 const linkClass =
-  "flex size-10 items-center justify-center rounded-md transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1B2A4A] focus:ring-offset-2";
+  "flex size-10 items-center justify-center rounded-md transition-transform duration-100 hover:opacity-90 active:scale-[0.98] active:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]";
 
 /**
  * Fixed bottom nav. Two variants:
@@ -31,33 +31,25 @@ export function BottomNav({ variant, fixed = true, className }: BottomNavProps) 
       role="navigation"
       aria-label="Bottom navigation"
     >
-      {/* Left slot */}
+      {/* Left — Previous drafts */}
       <div className="flex w-1/3 items-center justify-start">
-        {variant === "default" ? (
-          <span className="size-10" aria-hidden />
-        ) : (
-          <Link href="/drafts" className={linkClass} aria-label="Previous drafts">
-            <Pencil className={iconClassName} />
-          </Link>
-        )}
+        <Link href="/drafts" className={linkClass} aria-label="Previous drafts">
+          <Pencil className={iconClassName} />
+        </Link>
       </div>
 
-      {/* Center slot — Home */}
+      {/* Center — Home */}
       <div className="flex w-1/3 items-center justify-center">
         <Link href="/" className={linkClass} aria-label="Home">
           <Home className={iconClassName} />
         </Link>
       </div>
 
-      {/* Right slot */}
+      {/* Right — Public feed */}
       <div className="flex w-1/3 items-center justify-end">
-        {variant === "default" ? (
-          <span className="size-10" aria-hidden />
-        ) : (
-          <Link href="/feed" className={linkClass} aria-label="Public feed">
-            <BookOpen className={iconClassName} />
-          </Link>
-        )}
+        <Link href="/feed" className={linkClass} aria-label="Public feed">
+          <BookOpen className={iconClassName} />
+        </Link>
       </div>
     </nav>
   );

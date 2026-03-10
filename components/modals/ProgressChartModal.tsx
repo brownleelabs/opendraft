@@ -17,7 +17,7 @@ export interface ProgressChartModalProps {
 
 function getEncouragement(percentComplete: number): string {
   if (percentComplete === 0) {
-    return "Start by describing the change you want to see.";
+    return "Your draft has 7 sections. As you answer the questions above, we fill each section. When all 7 are complete, you can publish your draft.";
   }
   if (percentComplete <= 42) {
     return "Good start. Keep answering the questions.";

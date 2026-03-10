@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -63,17 +64,25 @@ export function DraftCard({
 }: DraftCardProps) {
   return (
     <Card>
-      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
-        <CategoryTag path={path} />
-        <LikelihoodBadge score={likelihoodScore} visible={true} />
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <CardTitle className="font-serif text-[#1B2A4A]">{title}</CardTitle>
-        <p className="font-sans text-sm text-muted-foreground line-clamp-3">
-          {excerpt}
-        </p>
-      </CardContent>
-      <CardFooter className="flex flex-wrap items-center justify-between gap-2 border-t pt-4">
+      <Link
+        href={`/feed/${id}`}
+        className="block focus-visible:ring-2 focus-visible:ring-[#2D5016] focus-visible:ring-offset-2 rounded-lg outline-none"
+      >
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
+          <CategoryTag path={path} />
+          <LikelihoodBadge score={likelihoodScore} visible={true} />
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <CardTitle className="font-serif text-[#1B2A4A]">{title}</CardTitle>
+          <p className="font-sans text-sm text-muted-foreground line-clamp-3">
+            {excerpt}
+          </p>
+        </CardContent>
+      </Link>
+      <CardFooter
+        className="flex flex-wrap items-center justify-between gap-2 border-t pt-4"
+        onClick={(e) => e.stopPropagation()}
+      >
         <span className="text-xs text-muted-foreground">
           {formatPublishedDate(publishedAt)}
         </span>

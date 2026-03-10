@@ -14,7 +14,7 @@ export function VoteButtons({ voteCount, onVote }: VoteButtonsProps) {
       <button
         type="button"
         onClick={() => onVote(-1)}
-        className="flex size-8 items-center justify-center rounded-md border border-[#1B2A4A]/20 bg-transparent text-[#1B2A4A] transition-colors hover:bg-[#1B2A4A]/5"
+        className="flex size-8 items-center justify-center rounded-md border border-[#1B2A4A]/20 bg-transparent text-[#1B2A4A] transition-transform duration-100 hover:bg-[#1B2A4A]/5 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2"
         aria-label="Downvote"
       >
         ▼
@@ -25,7 +25,7 @@ export function VoteButtons({ voteCount, onVote }: VoteButtonsProps) {
       <button
         type="button"
         onClick={() => onVote(1)}
-        className="flex size-8 items-center justify-center rounded-md border border-[#1B2A4A]/20 bg-transparent text-[#1B2A4A] transition-colors hover:bg-[#1B2A4A]/5"
+        className="flex size-8 items-center justify-center rounded-md border border-[#1B2A4A]/20 bg-transparent text-[#1B2A4A] transition-transform duration-100 hover:bg-[#1B2A4A]/5 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2"
         aria-label="Upvote"
       >
         ▲

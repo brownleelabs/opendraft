@@ -10,8 +10,10 @@ const DEFAULT_PLACEHOLDER = "Describe the change you want to see.";
 interface InputFieldProps {
   onSubmit: (value: string) => void;
   disabled?: boolean;
-  /** When provided (e.g. latest AI question), shown as placeholder and used for aria-label. */
+  /** When provided (e.g. "Enter your answer here"), shown as placeholder. */
   placeholder?: string;
+  /** Label above the input; "Your idea" by default, "Your answer" in Q&A flow. */
+  label?: string;
 }
 
 /**
@@ -23,6 +25,7 @@ export function InputField({
   onSubmit,
   disabled = false,
   placeholder = DEFAULT_PLACEHOLDER,
+  label = "Your idea",
 }: InputFieldProps) {
   const [value, setValue] = useState("");
   const isEmpty = value.trim() === "";
@@ -51,7 +54,7 @@ export function InputField({
         htmlFor="draft-input"
         className="text-sm font-medium text-[#2D5016]"
       >
-        Your idea
+        {label}
       </label>
       <div className="flex flex-col gap-2 md:flex-row md:items-end">
         <Textarea
@@ -71,7 +74,7 @@ export function InputField({
           type="button"
           onClick={handleSubmit}
           disabled={isEmpty || disabled}
-          className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#1B2A4A] px-4 text-white transition-opacity hover:enabled:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#1B2A4A] px-4 text-white transition-transform duration-100 hover:enabled:opacity-90 active:enabled:scale-[0.98] active:enabled:opacity-80 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
           aria-label="Send"
         >
           <Send className="size-5" />

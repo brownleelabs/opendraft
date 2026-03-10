@@ -11,7 +11,7 @@ export default function DraftsPage() {
   return (
     <>
       <TopNav />
-      <div className="min-h-screen pt-14 pb-14 px-4">
+      <div className="min-h-screen pt-20 pb-14 px-4">
         <h1 className="font-serif text-[#1B2A4A] text-xl font-semibold mb-6">
           Previous Drafts
         </h1>

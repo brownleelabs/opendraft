@@ -12,7 +12,7 @@ export function ProgressButton({ onTap, percentComplete }: ProgressButtonProps) 
     <button
       type="button"
       onClick={onTap}
-      className="flex w-5 flex-col items-center gap-0.5 border-0 bg-transparent p-0 text-[#1B2A4A]"
+      className="flex h-8 w-8 flex-col items-center justify-center gap-0.5 -m-1.5 rounded-md border-0 bg-transparent p-0 text-[#1B2A4A] transition-transform duration-100 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
       aria-label="View draft progress"
     >
       <BarChart2 className="h-5 w-5 shrink-0" />

@@ -18,7 +18,8 @@ export default function Home() {
   return (
     <>
       <TopNav onInfoTap={() => setInfoOpen(true)} />
-      <div className="pt-14 pb-14">
+      {/* pt-20: clear fixed header (14) + GOV.UK-style buffer (~24px) */}
+      <div className="pt-20 pb-14">
         <Paper variant="compact">
           <PaperScrollContainer>
             <PaperOnboardingCopy />
@@ -30,7 +31,7 @@ export default function Home() {
         <div className="relative z-20 flex justify-center px-4 pt-2">
           <Link
             href="/draft"
-            className="relative z-20 inline-block rounded-none bg-[#1B2A4A] px-8 py-3 font-sans text-sm font-semibold uppercase tracking-wide text-white shadow-sm transition-opacity hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-[#1B2A4A] focus:ring-offset-2 focus:ring-offset-[#FAF8F3] skew-x-[-6deg]"
+            className="relative z-20 inline-block rounded-none bg-[#1B2A4A] px-8 py-3 font-sans text-sm font-semibold uppercase tracking-wide text-white shadow-sm transition-transform duration-100 hover:opacity-95 active:scale-[0.98] active:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3] skew-x-[-6deg]"
           >
             <span className="inline-block skew-x-[6deg]">CREATE A DRAFT</span>
           </Link>

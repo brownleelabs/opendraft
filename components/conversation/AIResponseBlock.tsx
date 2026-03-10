@@ -14,14 +14,14 @@ export function AIResponseBlock({ understood, question }: AIResponseBlockProps) 
   }
 
   return (
-    <div className="border border-gray-200 border-l-4 border-l-[#2D5016] bg-white px-4 py-3 text-[#1B2A4A] shadow-sm">
-      <p className="mb-2">
-        <span className="font-normal">Understood: </span>
+    <div className="border border-gray-200 border-l-4 border-l-[#2D5016] bg-white px-4 py-3 shadow-sm">
+      <p className="mb-2 font-medium text-[#1B2A4A]">
+        <span>Understood: </span>
         <span>{understood}</span>
       </p>
-      <p>
-        <span className="font-semibold">Question: </span>
-        <span className="font-medium">"{question}"</span>
+      <p className="font-medium text-[#2D5016]">
+        <span>Question: </span>
+        <span>&quot;{question}&quot;</span>
       </p>
     </div>
   );

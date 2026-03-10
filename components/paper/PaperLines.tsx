@@ -6,7 +6,7 @@
 export function PaperLines() {
   return (
     <div
-      className="h-full w-full bg-[repeating-linear-gradient(to_bottom,#E8EDF4_0px,#E8EDF4_1px,transparent_1px,transparent_28px)]"
+      className="min-h-full w-full bg-[repeating-linear-gradient(to_bottom,#E8EDF4_0px,#E8EDF4_1px,transparent_1px,transparent_28px)]"
       aria-hidden
     />
   );

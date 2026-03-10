@@ -83,6 +83,9 @@ OpenDraft looks like a civic institution, not a tech startup. The references are
 - Dark mode (not in v1)
 - Generic sans-serif body text on the paper component
 
+### GOV.UK Design System alignment
+We use [GOV.UK Design System](https://design-system.service.gov.uk/) for spacing scale, focus/active states, and component patterns where applicable. We keep OpenDraft colours (navy, forest green, cream, white) and typography (serif for document, Inter for UI). Spacing follows an 8px base scale (Tailwind: 2, 4, 6, 8, 10, 12). All interactive elements have a visible focus style (e.g. 2–3px ring, offset) and an active/pressed state for tactility (e.g. `active:scale-[0.98]` or `active:opacity-80`). Touch targets and tap feedback follow GOV.UK guidance. We do not install `govuk-frontend`; we apply the scale and patterns via Tailwind and our components.
+
 ---
 
 ## The Paper Metaphor

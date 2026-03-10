@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AIResponseBlock } from "@/components/conversation/AIResponseBlock";
@@ -283,59 +283,46 @@ export default function DraftPage() {
   );
 
   const hasMessages = messages.length > 0;
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hasMessages || !carouselRef.current) return;
+    carouselRef.current.scrollTo({
+      left: carouselRef.current.scrollWidth,
+      behavior: "smooth",
+    });
+  }, [messages.length, hasMessages]);
 
   return (
     <>
       <TopNav onInfoTap={() => setInfoOpen(true)} />
-      <div className="pt-14 pb-14">
+      {/* pt-20: clear fixed header + buffer below TopNav */}
+      <div className="pt-20 pb-14">
         <Paper variant="compact">
           <PaperScrollContainer>
-            {!hasMessages && (
-              <>
+            <div className="relative min-h-full">
+              {/* Lines as background so paper always looks lined */}
+              <div className="absolute inset-0 z-0 min-h-full" aria-hidden>
                 <PaperLines />
-                <PaperOnboardingCopy />
-              </>
-            )}
-            {hasMessages && (
-              <>
-                <LiveDraftContent state={state} path={state.path} />
-                <DraftDocument state={state} allFilled={allFilled} />
-              </>
-            )}
+              </div>
+              <div className="relative z-10">
+                {!hasMessages && <PaperOnboardingCopy />}
+                {hasMessages && (
+                  <>
+                    <LiveDraftContent state={state} path={state.path} />
+                    <DraftDocument state={state} allFilled={allFilled} />
+                  </>
+                )}
+              </div>
+            </div>
           </PaperScrollContainer>
         </Paper>
-        {hasMessages && (
-          <div className="mx-4 mt-3 max-w-3xl md:mx-auto space-y-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#1B2A4A]/70">
-              What we&apos;ve understood
-            </p>
-            {messages.map((m, i) => (
-              <div key={i} className="space-y-2">
-                <p className="text-sm text-[#1B2A4A]">
-                  <span className="font-medium">You said:</span> {m.userInput}
-                </p>
-                <AIResponseBlock
-                  understood={m.understood}
-                  question={m.question}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-        {allFilled && (
-          <div className="mt-3 mx-4 max-w-3xl md:mx-auto">
-            <PublishButton
-              allFilled={allFilled}
-              onPublish={handlePublish}
-              isPublishing={isPublishing}
-            />
-          </div>
-        )}
+        {/* Toolbar and pagination attached directly below paper */}
         <Toolbar
           left={
             <LikelihoodBadge
               score={Math.round(likelihoodScore)}
-              visible={filledCount > 0}
+              visible={true}
               onTap={() => setLikelihoodOpen(true)}
             />
           }
@@ -362,14 +349,45 @@ export default function DraftPage() {
           }
         />
         <PaginationDots activeDot={3} />
+        {hasMessages && (
+          <div
+            ref={carouselRef}
+            className="mx-4 mt-3 flex overflow-x-auto overflow-y-hidden gap-4 snap-x snap-mandatory scroll-smooth pb-2 -mx-4 px-4 md:mx-auto md:max-w-3xl"
+            role="region"
+            aria-label="Conversation"
+          >
+            {messages.map((m, i) => (
+              <div
+                key={i}
+                className="min-w-[85%] max-w-[85%] md:min-w-[420px] md:max-w-[420px] shrink-0 snap-start space-y-2 rounded-lg border border-gray-200 bg-white p-4"
+              >
+                <p className="text-sm text-[#1B2A4A]">
+                  <span className="font-medium">You said:</span> {m.userInput}
+                </p>
+                <AIResponseBlock
+                  understood={m.understood}
+                  question={m.question}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+        {allFilled && (
+          <div className="mt-3 mx-4 max-w-3xl md:mx-auto">
+            <PublishButton
+              allFilled={allFilled}
+              onPublish={handlePublish}
+              isPublishing={isPublishing}
+            />
+          </div>
+        )}
         <InputField
           onSubmit={handleSubmit}
           disabled={isSubmitting}
           placeholder={
-            messages.length > 0
-              ? messages[messages.length - 1].question
-              : undefined
+            messages.length > 0 ? "Enter your answer here" : undefined
           }
+          label={messages.length > 0 ? "Your answer" : "Your idea"}
         />
       </div>
       <BottomNav variant="active" fixed={true} />

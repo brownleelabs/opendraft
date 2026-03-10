@@ -1,12 +1,11 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { DraftCard } from "@/components/feed/DraftCard";
 import type { Draft } from "@/lib/supabase-client";
 
-interface FeedDraftListProps {
-  drafts: Draft[];
-}
+const FINGERPRINT_KEY = "opendraft_device_fingerprint";
 
 function excerpt(text: string, maxLength: number = 120): string {
   const trimmed = text.trim();
@@ -14,18 +13,87 @@ function excerpt(text: string, maxLength: number = 120): string {
   return trimmed.slice(0, maxLength).trim() + "…";
 }
 
+function getStoredFingerprint(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(FINGERPRINT_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function setStoredFingerprint(fp: string): void {
+  try {
+    localStorage.setItem(FINGERPRINT_KEY, fp);
+  } catch {
+    /* ignore */
+  }
+}
+
+interface FeedDraftListProps {
+  drafts: Draft[];
+}
+
 /**
- * Client list of draft cards. Handles vote via POST /api/vote (stub).
+ * Client list of draft cards. Handles vote via POST /api/vote with optimistic UI.
  */
 export function FeedDraftList({ drafts }: FeedDraftListProps) {
-  const handleVote = useCallback(async (draftId: string, value: 1 | -1) => {
-    await fetch("/api/vote", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ draftId, value }),
+  const [voteCounts, setVoteCounts] = useState<Record<string, number>>(() =>
+    Object.fromEntries(
+      drafts.map((d) => [d.id, d.vote_count ?? 0])
+    )
+  );
+
+  useEffect(() => {
+    setVoteCounts((prev) => {
+      const next = { ...prev };
+      for (const d of drafts) {
+        next[d.id] = d.vote_count ?? 0;
+      }
+      return next;
     });
-    // Stub: no state update until v1.5
-  }, []);
+  }, [drafts]);
+
+  const handleVote = useCallback(
+    async (draftId: string, value: 1 | -1) => {
+      setVoteCounts((c) => {
+        const prev = c[draftId] ?? 0;
+        return { ...c, [draftId]: prev + value };
+      });
+      const prev = voteCounts[draftId] ?? 0;
+
+      const deviceFingerprint = getStoredFingerprint();
+      const res = await fetch("/api/vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          draftId,
+          value,
+          deviceFingerprint: deviceFingerprint ?? undefined,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (res.status === 409) {
+        setVoteCounts((c) => ({ ...c, [draftId]: prev }));
+        toast.error("You've already voted on this draft.");
+        return;
+      }
+      if (!res.ok) {
+        setVoteCounts((c) => ({ ...c, [draftId]: prev }));
+        toast.error("Vote failed. Please try again.");
+        return;
+      }
+      if (typeof data.newTotal === "number") {
+        setVoteCounts((c) => ({ ...c, [draftId]: data.newTotal }));
+      }
+      if (data.deviceFingerprint) {
+        setStoredFingerprint(data.deviceFingerprint);
+      }
+    },
+    [voteCounts]
+  );
 
   return (
     <ul className="flex flex-col gap-4 list-none p-0 m-0">
@@ -38,7 +106,7 @@ export function FeedDraftList({ drafts }: FeedDraftListProps) {
             excerpt={excerpt(d.formatted_document)}
             likelihoodScore={d.likelihood_score}
             publishedAt={d.published_at}
-            voteCount={d.vote_count ?? 0}
+            voteCount={voteCounts[d.id] ?? d.vote_count ?? 0}
             onVote={(value) => handleVote(d.id, value)}
           />
         </li>

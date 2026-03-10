@@ -21,7 +21,7 @@ export function TopNav({ onInfoTap }: TopNavProps) {
       <button
         type="button"
         onClick={onInfoTap}
-        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-white transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#1B2A4A]"
+        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-white transition-transform duration-100 hover:opacity-90 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1B2A4A]"
         aria-label="Info"
       >
         {/* Circled digit one (U+2460) */}

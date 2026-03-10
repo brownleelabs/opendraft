@@ -107,8 +107,17 @@ export function GoalTreeModal({
           </SheetTitle>
         </SheetHeader>
         <p className="px-4 text-sm text-[#1B2A4A]/80">
-          These 7 sections are what we&apos;re filling in as you answer. Each
-          one becomes part of your final draft.
+          Your final draft will have 7 sections (e.g. the problem, the
+          solution, who it affects). We fill each section from your answers.
+          The list below shows which sections we&apos;ve started and which are
+          complete.
+          {path === "unrouted" && (
+            <>
+              {" "}
+              Once we know whether you&apos;re proposing a policy or a product
+              change, we&apos;ll show the exact section names.
+            </>
+          )}
         </p>
         <div className="flex flex-col gap-3 px-4 pb-6">
           {SLOT_KEYS.map((key, index) => {

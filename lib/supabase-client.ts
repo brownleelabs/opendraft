@@ -97,7 +97,41 @@ export async function publishDraft(
 }
 
 /**
- * Fetch all published drafts for the feed, ordered by published_at descending.
+ * Fetch a single published draft by id. Returns null if not found.
+ */
+export async function fetchDraftById(id: string): Promise<Draft | null> {
+  try {
+    const supabase = getClient();
+    const { data, error } = await supabase
+      .from("drafts")
+      .select("id, path, title, formatted_document, likelihood_score, published_at")
+      .eq("id", id)
+      .single();
+
+    if (error || !data) return null;
+    const r = data as {
+      id: string;
+      path: string;
+      title: string | null;
+      formatted_document: string | null;
+      likelihood_score: number;
+      published_at: string;
+    };
+    return {
+      id: r.id,
+      path: r.path,
+      title: r.title ?? "",
+      formatted_document: r.formatted_document ?? "",
+      likelihood_score: r.likelihood_score,
+      published_at: r.published_at,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetch all published drafts for the feed with vote counts, ordered by published_at descending.
  */
 export async function fetchDrafts(): Promise<Draft[]> {
   try {
@@ -117,6 +151,19 @@ export async function fetchDrafts(): Promise<Draft[]> {
       likelihood_score: number;
       published_at: string;
     }>;
+    const ids = rows.map((r) => r.id);
+    const voteCountByDraft: Record<string, number> = {};
+    if (ids.length > 0) {
+      const { data: voteRows } = await supabase
+        .from("votes")
+        .select("draft_id, value")
+        .in("draft_id", ids);
+      for (const v of voteRows ?? []) {
+        const id = (v as { draft_id: string; value: number }).draft_id;
+        const val = (v as { draft_id: string; value: number }).value;
+        voteCountByDraft[id] = (voteCountByDraft[id] ?? 0) + val;
+      }
+    }
     return rows.map((r) => ({
       id: r.id,
       path: r.path,
@@ -124,6 +171,7 @@ export async function fetchDrafts(): Promise<Draft[]> {
       formatted_document: r.formatted_document ?? "",
       likelihood_score: r.likelihood_score,
       published_at: r.published_at,
+      vote_count: voteCountByDraft[r.id] ?? 0,
     }));
   } catch (err) {
     const message = err instanceof Error ? err.message : "fetchDrafts failed";
