@@ -1,4 +1,5 @@
 import { clsx } from "clsx";
+import Link from "next/link";
 import { BookOpen, Home, Pencil } from "lucide-react";
 
 type BottomNavVariant = "default" | "active";
@@ -9,6 +10,10 @@ interface BottomNavProps {
   className?: string;
 }
 
+const iconClassName = "size-6 text-[#1B2A4A]";
+const linkClass =
+  "flex size-10 items-center justify-center rounded-md transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1B2A4A] focus:ring-offset-2";
+
 /**
  * Fixed bottom nav. Two variants:
  * - default (Screen 1): left/right placeholders, center Home icon
@@ -16,8 +21,6 @@ interface BottomNavProps {
  * White background, light gray top border. Icons from lucide-react.
  */
 export function BottomNav({ variant, fixed = true, className }: BottomNavProps) {
-  const iconClassName = "size-6 text-[#1B2A4A]";
-
   return (
     <nav
       className={clsx(
@@ -33,25 +36,17 @@ export function BottomNav({ variant, fixed = true, className }: BottomNavProps) 
         {variant === "default" ? (
           <span className="size-10" aria-hidden />
         ) : (
-          <button
-            type="button"
-            className="flex size-10 items-center justify-center rounded-md transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1B2A4A] focus:ring-offset-2"
-            aria-label="Previous drafts"
-          >
+          <Link href="/drafts" className={linkClass} aria-label="Previous drafts">
             <Pencil className={iconClassName} />
-          </button>
+          </Link>
         )}
       </div>
 
       {/* Center slot — Home */}
       <div className="flex w-1/3 items-center justify-center">
-        <button
-          type="button"
-          className="flex size-10 items-center justify-center rounded-md transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1B2A4A] focus:ring-offset-2"
-          aria-label="Home"
-        >
+        <Link href="/" className={linkClass} aria-label="Home">
           <Home className={iconClassName} />
-        </button>
+        </Link>
       </div>
 
       {/* Right slot */}
@@ -59,13 +54,9 @@ export function BottomNav({ variant, fixed = true, className }: BottomNavProps) 
         {variant === "default" ? (
           <span className="size-10" aria-hidden />
         ) : (
-          <button
-            type="button"
-            className="flex size-10 items-center justify-center rounded-md transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1B2A4A] focus:ring-offset-2"
-            aria-label="Public feed"
-          >
+          <Link href="/feed" className={linkClass} aria-label="Public feed">
             <BookOpen className={iconClassName} />
-          </button>
+          </Link>
         )}
       </div>
     </nav>

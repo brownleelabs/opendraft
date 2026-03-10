@@ -17,6 +17,7 @@ import { LikelihoodBadge } from "@/components/toolbar/LikelihoodBadge";
 import { MemoryButton } from "@/components/toolbar/MemoryButton";
 import { ProgressButton } from "@/components/toolbar/ProgressButton";
 import { Toolbar } from "@/components/toolbar/Toolbar";
+import { User } from "lucide-react";
 import { GoalTreeModal } from "@/components/modals/GoalTreeModal";
 import { LikelihoodDetailPanel } from "@/components/modals/LikelihoodDetailPanel";
 import { ProgressChartModal } from "@/components/modals/ProgressChartModal";
@@ -112,7 +113,7 @@ const initialGoalTreeState: GoalTreeState = {
   nextQuestion: "",
 };
 
-type MessageItem = { understood: string; question: string };
+type MessageItem = { understood: string; question: string; userInput: string };
 
 type ConversationMessage = { role: "user" | "assistant"; content: string };
 
@@ -227,7 +228,7 @@ export default function DraftPage() {
           return;
         }
         const { understood, question, updatedState, rawResponse } = data;
-        setMessages((prev) => [...prev, { understood, question }]);
+        setMessages((prev) => [...prev, { understood, question, userInput: input }]);
         setState(updatedState);
         const updatedHistory: ConversationMessage[] = [
           ...history,
@@ -287,7 +288,7 @@ export default function DraftPage() {
     <>
       <TopNav onInfoTap={() => setInfoOpen(true)} />
       <div className="pt-14 pb-14">
-        <Paper>
+        <Paper variant="compact">
           <PaperScrollContainer>
             {!hasMessages && (
               <>
@@ -298,18 +299,29 @@ export default function DraftPage() {
             {hasMessages && (
               <>
                 <LiveDraftContent state={state} path={state.path} />
-                {messages.map((m, i) => (
-                  <AIResponseBlock
-                    key={i}
-                    understood={m.understood}
-                    question={m.question}
-                  />
-                ))}
                 <DraftDocument state={state} allFilled={allFilled} />
               </>
             )}
           </PaperScrollContainer>
         </Paper>
+        {hasMessages && (
+          <div className="mx-4 mt-3 max-w-3xl md:mx-auto space-y-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-[#1B2A4A]/70">
+              What we&apos;ve understood
+            </p>
+            {messages.map((m, i) => (
+              <div key={i} className="space-y-2">
+                <p className="text-sm text-[#1B2A4A]">
+                  <span className="font-medium">You said:</span> {m.userInput}
+                </p>
+                <AIResponseBlock
+                  understood={m.understood}
+                  question={m.question}
+                />
+              </div>
+            ))}
+          </div>
+        )}
         {allFilled && (
           <div className="mt-3 mx-4 max-w-3xl md:mx-auto">
             <PublishButton
@@ -323,7 +335,7 @@ export default function DraftPage() {
           left={
             <LikelihoodBadge
               score={Math.round(likelihoodScore)}
-              visible={true}
+              visible={filledCount > 0}
               onTap={() => setLikelihoodOpen(true)}
             />
           }
@@ -339,9 +351,26 @@ export default function DraftPage() {
               percentComplete={percentComplete}
             />
           }
+          right={
+            <span
+              className="flex size-10 items-center justify-center rounded-md opacity-50"
+              title="Expert (coming soon)"
+              aria-hidden
+            >
+              <User className="size-6 text-[#1B2A4A]" />
+            </span>
+          }
         />
         <PaginationDots activeDot={3} />
-        <InputField onSubmit={handleSubmit} disabled={isSubmitting} />
+        <InputField
+          onSubmit={handleSubmit}
+          disabled={isSubmitting}
+          placeholder={
+            messages.length > 0
+              ? messages[messages.length - 1].question
+              : undefined
+          }
+        />
       </div>
       <BottomNav variant="active" fixed={true} />
       <GoalTreeModal

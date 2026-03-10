@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Paper } from "@/components/paper/Paper";
 import { PaperLines } from "@/components/paper/PaperLines";
+import { PaperOnboardingCopy } from "@/components/paper/PaperOnboardingCopy";
 import { PaperScrollContainer } from "@/components/paper/PaperScrollContainer";
 import { BottomNav } from "@/components/shell/BottomNav";
 import { PaginationDots } from "@/components/shell/PaginationDots";
@@ -18,8 +19,9 @@ export default function Home() {
     <>
       <TopNav onInfoTap={() => setInfoOpen(true)} />
       <div className="pt-14 pb-14">
-        <Paper>
+        <Paper variant="compact">
           <PaperScrollContainer>
+            <PaperOnboardingCopy />
             <PaperLines />
           </PaperScrollContainer>
         </Paper>

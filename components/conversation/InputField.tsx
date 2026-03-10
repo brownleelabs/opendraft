@@ -5,17 +5,25 @@ import { useCallback, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
+const DEFAULT_PLACEHOLDER = "Describe the change you want to see.";
+
 interface InputFieldProps {
   onSubmit: (value: string) => void;
   disabled?: boolean;
+  /** When provided (e.g. latest AI question), shown as placeholder and used for aria-label. */
+  placeholder?: string;
 }
 
 /**
  * Input for draft conversation. shadcn Textarea, forest green label and border.
- * Idle: placeholder "Describe the change you want to see." Active: border brightens.
+ * Idle: placeholder "Describe the change you want to see." or current question. Active: border brightens.
  * Send button (navy) disabled when empty; fires onSubmit on tap or Enter, then clears.
  */
-export function InputField({ onSubmit, disabled = false }: InputFieldProps) {
+export function InputField({
+  onSubmit,
+  disabled = false,
+  placeholder = DEFAULT_PLACEHOLDER,
+}: InputFieldProps) {
   const [value, setValue] = useState("");
   const isEmpty = value.trim() === "";
   const isActive = value.length > 0;
@@ -51,13 +59,13 @@ export function InputField({ onSubmit, disabled = false }: InputFieldProps) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Describe the change you want to see."
+          placeholder={placeholder}
           disabled={disabled}
           className={cn(
             "min-h-16 flex-1 border-[#2D5016] placeholder:text-[#2D5016]/60 focus-visible:border-[#3a6b1c] focus-visible:ring-[#2D5016]/20",
             isActive && "border-[#3a6b1c]"
           )}
-          aria-label="Describe the change you want to see"
+          aria-label={placeholder}
         />
         <button
           type="button"

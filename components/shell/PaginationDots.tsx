@@ -2,9 +2,16 @@ interface PaginationDotsProps {
   activeDot: 1 | 2 | 3;
 }
 
+const SCREEN_LABELS: Record<1 | 2 | 3, string> = {
+  1: "home",
+  2: "create draft",
+  3: "conversation",
+};
+
 /**
  * Three dots in a horizontal row, centered. One dot is active (filled navy);
- * the others are unfilled with navy border. Sits between toolbar and input.
+ * the others are unfilled with navy border. Indicates which screen you're on
+ * (1 = home, 2 = create, 3 = conversation). Not swipeable.
  */
 export function PaginationDots({ activeDot }: PaginationDotsProps) {
   const dotBase =
@@ -16,7 +23,8 @@ export function PaginationDots({ activeDot }: PaginationDotsProps) {
     <div
       className="flex items-center justify-center gap-2 py-2"
       role="tablist"
-      aria-label="Screen position"
+      aria-label={`Screen ${activeDot} of 3: ${SCREEN_LABELS[activeDot]}. Screen position indicator.`}
+      title={`Screen position: ${SCREEN_LABELS[activeDot]}`}
     >
       <span
         className={`${dotBase} ${activeDot === 1 ? activeClass : inactiveClass}`}

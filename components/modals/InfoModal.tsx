@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Sheet,
   SheetContent,
@@ -15,10 +15,12 @@ export interface InfoModalProps {
 
 export function InfoModal({ open, onClose }: InfoModalProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleGetStarted = () => {
     onClose();
-    router.push("/draft");
+    if (pathname === "/draft") return;
+    setTimeout(() => router.push("/draft"), 0);
   };
 
   return (
