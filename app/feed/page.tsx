@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   description: "All published drafts from OpenDraft citizens.",
 };
 
+const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
+
 export default async function FeedPage() {
   let drafts: Awaited<ReturnType<typeof fetchDrafts>> = [];
   let error: string | null = null;
@@ -17,5 +19,17 @@ export default async function FeedPage() {
   } catch (e) {
     error = e instanceof Error ? e.message : "Failed to load drafts.";
   }
-  return <FeedPageClient drafts={drafts} error={error} />;
+  const totalPublished = drafts.length;
+  const sevenDaysAgo = new Date(Date.now() - MS_PER_WEEK);
+  const thisWeek = drafts.filter(
+    (d) => new Date(d.published_at) >= sevenDaysAgo
+  ).length;
+  return (
+    <FeedPageClient
+      drafts={drafts}
+      totalPublished={totalPublished}
+      thisWeek={thisWeek}
+      error={error}
+    />
+  );
 }

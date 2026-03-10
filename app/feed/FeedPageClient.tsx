@@ -1,62 +1,78 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TopNav } from "@/components/shell/TopNav";
 import { BottomNav } from "@/components/shell/BottomNav";
-import { FeedDraftList } from "@/components/feed/FeedDraftList";
+import { FeedList } from "@/components/feed/FeedList";
 import { InfoModal } from "@/components/modals/InfoModal";
 import type { Draft } from "@/lib/supabase-client";
 
 interface FeedPageClientProps {
   drafts: Draft[];
+  totalPublished: number;
+  thisWeek: number;
   error?: string | null;
 }
 
-export function FeedPageClient({ drafts, error }: FeedPageClientProps) {
+export function FeedPageClient({
+  drafts,
+  totalPublished,
+  thisWeek,
+  error,
+}: FeedPageClientProps) {
   const [infoOpen, setInfoOpen] = useState(false);
-  const router = useRouter();
 
   return (
     <>
       <TopNav onInfoTap={() => setInfoOpen(true)} />
-      <div className="min-h-screen pt-20 pb-14 px-4">
-        <h1 className="font-serif text-[#1B2A4A] text-xl font-semibold mb-6">
-          Public Drafts
-        </h1>
-        <div className="overflow-y-auto max-w-3xl mx-auto">
-          {error ? (
-            <div
-              className="rounded-lg border border-red-200 bg-red-50 p-6 text-center"
-              role="alert"
-            >
-              <p className="font-sans text-[#1B2A4A] text-sm">
+      <div className="min-h-screen bg-[#FAF8F3] pb-14 pt-20">
+        {error ? (
+          <div
+            className="mx-auto max-w-2xl px-4 pt-8"
+            role="alert"
+          >
+            <div className="rounded-[2px] border border-red-200 bg-red-50 p-6 text-center">
+              <p className="font-sans text-sm text-[#1B2A4A]">
                 Unable to load drafts.
               </p>
-              <p className="mt-1 font-sans text-[#1B2A4A]/70 text-sm">
+              <p className="mt-1 font-sans text-sm text-[#1B2A4A]/70">
                 {error}
               </p>
-              <button
-                type="button"
-                onClick={() => router.refresh()}
-                className="mt-4 min-h-[44px] rounded-lg bg-[#1B2A4A] px-4 py-2 font-sans text-sm font-medium text-white transition-transform hover:opacity-90 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
+              <Link
+                href="/"
+                className="mt-4 inline-flex min-h-[44px] items-center font-sans text-sm font-medium text-[#2D5016] underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2D5016] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
               >
-                Try again
-              </button>
-              <p className="mt-3">
-                <Link
-                  href="/"
-                  className="inline-flex min-h-[44px] items-center text-sm text-[#2D5016] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2D5016] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3] rounded"
-                >
-                  ← Back to home
-                </Link>
-              </p>
+                ← Back to home
+              </Link>
             </div>
-          ) : (
-            <FeedDraftList drafts={drafts} />
-          )}
-        </div>
+          </div>
+        ) : (
+          <>
+            <header className="border-b border-[#E8E3D8] bg-white pb-12 pt-16">
+              <div className="mx-auto max-w-2xl px-4 text-left">
+                <p className="mb-3 font-sans text-xs font-medium uppercase tracking-[0.2em] text-[#6B7280]">
+                  PUBLIC RECORD
+                </p>
+                <h1 className="font-serif text-[32px] leading-[1.1] text-[#1B2A4A] md:text-[48px]">
+                  The OpenDraft Feed
+                </h1>
+                <p className="mt-3 font-sans text-base text-[#6B7280]">
+                  Structured proposals from the public — for lawmakers and companies.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  <span className="rounded-full border border-[#E8E3D8] px-4 py-1.5 font-sans text-sm text-[#1B2A4A]">
+                    {totalPublished} proposals published
+                  </span>
+                  <span className="rounded-full border border-[#E8E3D8] px-4 py-1.5 font-sans text-sm text-[#1B2A4A]">
+                    {thisWeek} this week
+                  </span>
+                </div>
+              </div>
+            </header>
+            <FeedList drafts={drafts} />
+          </>
+        )}
       </div>
       <BottomNav variant="active" fixed={true} />
       <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />

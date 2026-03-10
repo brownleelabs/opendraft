@@ -7,12 +7,6 @@ import type { Draft } from "@/lib/supabase-client";
 
 const FINGERPRINT_KEY = "opendraft_device_fingerprint";
 
-function excerpt(text: string, maxLength: number = 120): string {
-  const trimmed = text.trim();
-  if (trimmed.length <= maxLength) return trimmed;
-  return trimmed.slice(0, maxLength).trim() + "…";
-}
-
 function getStoredFingerprint(): string | null {
   if (typeof window === "undefined") return null;
   try {
@@ -120,8 +114,7 @@ export function FeedDraftList({ drafts }: FeedDraftListProps) {
             id={d.id}
             path={d.path === "product" ? "product" : "policy"}
             title={d.title}
-            excerpt={excerpt(d.formatted_document)}
-            likelihoodScore={d.likelihood_score}
+            formattedDocument={d.formatted_document}
             publishedAt={d.published_at}
             voteCount={voteCounts[d.id] ?? d.vote_count ?? 0}
             onVote={(value) => handleVote(d.id, value)}

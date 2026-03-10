@@ -1,93 +1,86 @@
 "use client";
 
-import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { LikelihoodBadge } from "@/components/toolbar/LikelihoodBadge";
 import { VoteButtons } from "@/components/feed/VoteButtons";
 
 export interface DraftCardProps {
   id: string;
   path: "policy" | "product";
   title: string;
-  excerpt: string;
-  likelihoodScore: number;
+  formattedDocument: string;
   publishedAt: string;
   voteCount: number;
   onVote: (value: 1 | -1) => void;
 }
 
-function CategoryTag({ path }: { path: "policy" | "product" }) {
-  return (
-    <Badge
-      className={
-        path === "policy"
-          ? "bg-[#1B2A4A] text-white"
-          : "bg-[#2D5016] text-white"
-      }
-    >
-      {path === "policy" ? "Policy" : "Product"}
-    </Badge>
-  );
-}
-
-function formatPublishedDate(iso: string): string {
+function relativeTime(iso: string): string {
   try {
-    return new Date(iso).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    const date = new Date(iso);
+    const now = new Date();
+    const sec = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (sec < 60) return "just now";
+    if (sec < 3600) return `${Math.floor(sec / 60)}m ago`;
+    if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
+    if (sec < 604800) return `${Math.floor(sec / 86400)}d ago`;
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
   } catch {
     return iso;
   }
 }
 
-/**
- * Card for one published draft: CategoryTag, title (Playfair), excerpt (Inter), LikelihoodBadge, VoteButtons, date.
- */
+function excerpt(text: string, maxLength: number): string {
+  const trimmed = (text ?? "").trim();
+  if (trimmed.length <= maxLength) return trimmed || "";
+  return trimmed.slice(0, maxLength).trim() + "…";
+}
+
 export function DraftCard({
   id,
   path,
   title,
-  excerpt,
-  likelihoodScore,
+  formattedDocument,
   publishedAt,
   voteCount,
   onVote,
 }: DraftCardProps) {
+  const pathLabel = path === "policy" ? "POLICY" : "PRODUCT";
+  const displayTitle = (title ?? "").trim() || null;
+  const excerptText = excerpt(formattedDocument ?? "", 160);
+
   return (
-    <Card>
-      <Link
-        href={`/feed/${id}`}
-        className="block rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#2D5016] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-      >
-        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
-          <CategoryTag path={path} />
-          <LikelihoodBadge score={likelihoodScore} visible={true} />
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <CardTitle className="font-serif text-[#1B2A4A]">{title}</CardTitle>
-          <p className="font-sans text-sm text-muted-foreground line-clamp-3">
-            {excerpt}
-          </p>
-        </CardContent>
-      </Link>
-      <CardFooter
-        className="flex flex-wrap items-center justify-between gap-2 border-t pt-4"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <span className="text-xs text-muted-foreground">
-          {formatPublishedDate(publishedAt)}
+    <article
+      className="rounded-[2px] border border-[#E8E3D8] bg-white px-8 py-7 transition-[border-color,box-shadow] duration-150 hover:border-[#1B2A4A] hover:shadow-[0_4px_16px_rgba(27,42,74,0.06)]"
+      aria-labelledby={`draft-title-${id}`}
+    >
+      <div className="flex flex-row items-center justify-between gap-2">
+        <span
+          className="rounded-sm px-2.5 py-1 font-sans text-xs font-semibold uppercase text-white"
+          style={{
+            backgroundColor: path === "policy" ? "#1B2A4A" : "#2D5016",
+          }}
+        >
+          {pathLabel}
         </span>
+        <span className="font-sans text-xs text-[#9CA3AF]">
+          {relativeTime(publishedAt)}
+        </span>
+      </div>
+      <h2
+        id={`draft-title-${id}`}
+        className="mt-2 line-clamp-2 font-serif text-[18px] text-[#1B2A4A] md:text-[22px]"
+      >
+        {displayTitle ?? <span className="italic text-[#9CA3AF]">Untitled Draft</span>}
+      </h2>
+      {excerptText && (
+        <p className="mt-2 font-sans text-sm leading-relaxed text-[#4B5563]">
+          {excerptText}
+        </p>
+      )}
+      <div className="mt-4 flex flex-row flex-wrap items-center justify-between gap-4 border-t border-[#F3F4F6] pt-4">
         <VoteButtons voteCount={voteCount} onVote={onVote} />
-      </CardFooter>
-    </Card>
+        <span className="font-sans text-xs font-semibold uppercase tracking-wider text-[#1B2A4A]">
+          READ DRAFT →
+        </span>
+      </div>
+    </article>
   );
 }
