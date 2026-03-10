@@ -98,36 +98,47 @@ export async function publishDraft(
 
 /**
  * Fetch a single published draft by id. Returns null if not found.
+ * Throws on Supabase error (e.g. network). Use vote_count from returned draft for VoteButtons.
  */
 export async function fetchDraftById(id: string): Promise<Draft | null> {
-  try {
-    const supabase = getClient();
-    const { data, error } = await supabase
-      .from("drafts")
-      .select("id, path, title, formatted_document, likelihood_score, published_at")
-      .eq("id", id)
-      .single();
+  const supabase = getClient();
+  const { data, error } = await supabase
+    .from("drafts")
+    .select("id, path, title, formatted_document, likelihood_score, published_at")
+    .eq("id", id)
+    .single();
 
-    if (error || !data) return null;
-    const r = data as {
-      id: string;
-      path: string;
-      title: string | null;
-      formatted_document: string | null;
-      likelihood_score: number;
-      published_at: string;
-    };
-    return {
-      id: r.id,
-      path: r.path,
-      title: r.title ?? "",
-      formatted_document: r.formatted_document ?? "",
-      likelihood_score: r.likelihood_score,
-      published_at: r.published_at,
-    };
-  } catch {
-    return null;
+  if (error) {
+    if (error.code === "PGRST116") return null;
+    throw new Error(`fetchDraftById failed: ${error.message}`);
   }
+  if (!data) return null;
+
+  const r = data as {
+    id: string;
+    path: string;
+    title: string | null;
+    formatted_document: string | null;
+    likelihood_score: number;
+    published_at: string;
+  };
+
+  let vote_count = 0;
+  const { data: voteRows } = await supabase
+    .from("votes")
+    .select("value")
+    .eq("draft_id", id);
+  vote_count = (voteRows ?? []).reduce((sum, row) => sum + ((row as { value: number }).value ?? 0), 0);
+
+  return {
+    id: r.id,
+    path: r.path,
+    title: r.title ?? "",
+    formatted_document: r.formatted_document ?? "",
+    likelihood_score: r.likelihood_score,
+    published_at: r.published_at,
+    vote_count,
+  };
 }
 
 /**

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { VoteButtons } from "@/components/feed/VoteButtons";
 
 export interface DraftCardProps {
@@ -77,9 +78,12 @@ export function DraftCard({
       )}
       <div className="mt-4 flex flex-row flex-wrap items-center justify-between gap-4 border-t border-[#F3F4F6] pt-4">
         <VoteButtons voteCount={voteCount} onVote={onVote} />
-        <span className="min-h-[44px] min-w-[44px] flex items-center justify-center font-sans text-xs font-semibold uppercase tracking-wider text-[#1B2A4A]">
+        <Link
+          href={`/feed/${id}`}
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center font-sans text-xs font-semibold uppercase tracking-wider text-[#1B2A4A] no-underline hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2"
+        >
           READ DRAFT →
-        </span>
+        </Link>
       </div>
     </article>
   );
