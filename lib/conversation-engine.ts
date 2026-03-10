@@ -31,6 +31,27 @@ function parseResponse(rawResponse: string): { understood: string; question: str
   return { understood, question };
 }
 
+/**
+ * When in phase 1 with path unrouted, infer path from user input so the returned
+ * updatedState has path set and can be persisted correctly by the client.
+ */
+function inferPathFromInput(
+  state: GoalTreeState,
+  input: string
+): GoalTreeState {
+  if (state.phase !== 1 || state.path !== "unrouted") return state;
+  const lower = input.trim().toLowerCase();
+  const policyTerms = /policy|legislative|bill|law|government|regulation|statute|congress|senate|representative/i;
+  const productTerms = /product|feature|app|software|company|startup|saas|platform/i;
+  if (policyTerms.test(lower) && !productTerms.test(lower)) {
+    return { ...state, path: "policy", phase: 2 };
+  }
+  if (productTerms.test(lower)) {
+    return { ...state, path: "product", phase: 2 };
+  }
+  return state;
+}
+
 export async function processMessage(
   input: string,
   state: GoalTreeState,
@@ -48,10 +69,12 @@ export async function processMessage(
   ];
   const rawResponse = await conversationCall(messages, systemPrompt);
   const { understood, question } = parseResponse(rawResponse);
+  const baseState = state;
+  const updatedState = inferPathFromInput(baseState, input);
   return {
     understood,
     question,
-    updatedState: state,
+    updatedState,
     rawResponse,
   };
 }
