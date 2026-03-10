@@ -20,6 +20,7 @@ import { User } from "lucide-react";
 import { GoalTreeModal } from "@/components/modals/GoalTreeModal";
 import { ProgressChartModal } from "@/components/modals/ProgressChartModal";
 import { InfoModal } from "@/components/modals/InfoModal";
+import { ProgressBar } from "@/components/draft/ProgressBar";
 import { DraftDocument } from "@/components/output/DraftDocument";
 import { PublishButton } from "@/components/output/PublishButton";
 import { useSlotTracker } from "@/lib/slot-tracker";
@@ -166,6 +167,8 @@ export default function DraftPage() {
   const [infoOpen, setInfoOpen] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [streamingText, setStreamingText] = useState("");
+  const [paperPulse, setPaperPulse] = useState(false);
   const { filledCount, percentComplete, allFilled } = useSlotTracker(state);
 
   const handlePublish = useCallback(async () => {
@@ -206,62 +209,87 @@ export default function DraftPage() {
   const handleSubmit = useCallback(
     async (input: string) => {
       setIsSubmitting(true);
+      setStreamingText("");
       try {
         const res = await fetch("/api/conversation", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ input, state, history }),
         });
-        const data = await res.json().catch(() => ({} as { error?: string }));
         if (!res.ok) {
+          const data = await res.json().catch(() => ({} as { error?: string }));
           const message =
             typeof data?.error === "string" ? data.error : res.statusText || "Conversation request failed";
           throw new Error(message);
         }
-        if (!isValidConversationResponse(data)) {
-          console.error("Invalid conversation response shape", data);
-          toast.error("Something went wrong. Please try again.");
-          return;
-        }
-        const { understood, question, updatedState, rawResponse } = data;
-        setMessages((prev) => [...prev, { understood, question, userInput: input }]);
-        setState(updatedState);
-        const updatedHistory: ConversationMessage[] = [
-          ...history,
-          { role: "user", content: input },
-          { role: "assistant", content: rawResponse },
-        ];
-        setHistory(updatedHistory);
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error("No response body");
+        const decoder = new TextDecoder();
+        let accumulated = "";
+        let done = false;
+        while (!done) {
+          const { value, done: chunkDone } = await reader.read();
+          done = chunkDone;
+          if (value) {
+            accumulated += decoder.decode(value, { stream: true });
+            setStreamingText(accumulated);
+            const doneIndex = accumulated.indexOf("\n__DONE__");
+            if (doneIndex !== -1) {
+              const afterMarker = accumulated.slice(doneIndex + 1);
+              const jsonStr = afterMarker.startsWith("__DONE__") ? afterMarker.slice(8).split("\n")[0] : afterMarker.split("\n")[0];
+              try {
+                const data = JSON.parse(jsonStr) as unknown;
+                if (!isValidConversationResponse(data)) {
+                  console.error("Invalid conversation response shape", data);
+                  toast.error("Something went wrong. Please try again.");
+                  return;
+                }
+                const { understood, question, updatedState, rawResponse } = data;
+                setMessages((prev) => [...prev, { understood, question, userInput: input }]);
+                setState(updatedState);
+                const updatedHistory: ConversationMessage[] = [
+                  ...history,
+                  { role: "user", content: input },
+                  { role: "assistant", content: rawResponse },
+                ];
+                setHistory(updatedHistory);
+                setStreamingText("");
 
-        // Auto-save in background — do not await, do not block UI
-        const now = Date.now();
-        const historyForSave: ApiConversationMessage[] = [
-          ...history.map((m) => ({ ...m, timestamp: now })),
-          { role: "user", content: input, timestamp: now },
-          { role: "assistant", content: rawResponse, timestamp: now },
-        ];
-        saveConversation(
-          sessionId,
-          updatedState,
-          historyForSave,
-          updatedState.path === "unrouted" ? null : updatedState.path
-        ).catch((err) => console.error("Auto-save failed:", err));
+                const now = Date.now();
+                const historyForSave: ApiConversationMessage[] = [
+                  ...history.map((m) => ({ ...m, timestamp: now })),
+                  { role: "user", content: input, timestamp: now },
+                  { role: "assistant", content: rawResponse, timestamp: now },
+                ];
+                saveConversation(
+                  sessionId,
+                  updatedState,
+                  historyForSave,
+                  updatedState.path === "unrouted" ? null : updatedState.path
+                ).catch((err) => console.error("Auto-save failed:", err));
 
-        // Log session_started on first message only
-        if (messages.length === 0) {
-          logEvent(sessionId, "session_started", {
-            path: updatedState.path === "unrouted" ? undefined : updatedState.path,
-          });
-        }
+                if (messages.length === 0) {
+                  logEvent(sessionId, "session_started", {
+                    path: updatedState.path === "unrouted" ? undefined : updatedState.path,
+                  });
+                }
 
-        // Log slot_filled for any slot that moved to filled in this exchange
-        const previousFilled = Object.values(state.slots).filter((s) => s.status === "filled").length;
-        const updatedFilled = Object.values(updatedState.slots).filter((s) => s.status === "filled").length;
-        if (updatedFilled > previousFilled) {
-          logEvent(sessionId, "slot_filled", {
-            path: updatedState.path === "unrouted" ? undefined : updatedState.path,
-            slotNumber: updatedFilled,
-          });
+                const previousFilled = Object.values(state.slots).filter((s) => s.status === "filled").length;
+                const updatedFilled = Object.values(updatedState.slots).filter((s) => s.status === "filled").length;
+                if (updatedFilled > previousFilled) {
+                  setPaperPulse(true);
+                  logEvent(sessionId, "slot_filled", {
+                    path: updatedState.path === "unrouted" ? undefined : updatedState.path,
+                    slotNumber: updatedFilled,
+                  });
+                }
+              } catch (parseErr) {
+                console.error("Failed to parse __DONE__ payload", parseErr);
+                toast.error("Something went wrong. Please try again.");
+              }
+              break;
+            }
+          }
         }
       } catch (err) {
         const message =
@@ -289,12 +317,24 @@ export default function DraftPage() {
     });
   }, [messages.length, hasMessages]);
 
+  useEffect(() => {
+    if (!paperPulse) return;
+    const t = setTimeout(() => setPaperPulse(false), 700);
+    return () => clearTimeout(t);
+  }, [paperPulse]);
+
   return (
     <>
       <TopNav onInfoTap={() => setInfoOpen(true)} />
       {/* pt-20: clear fixed header + buffer below TopNav */}
       <div className="pt-20 pb-14">
-        <Paper variant="compact">
+        {filledCount > 0 && (
+          <ProgressBar
+            slotsFilledCount={filledCount}
+            path={state.path === "unrouted" ? null : state.path}
+          />
+        )}
+        <Paper variant="compact" pulse={paperPulse}>
           <PaperScrollContainer>
             <div className="relative min-h-full">
               {/* Lines as background so paper always looks lined */}
@@ -338,7 +378,7 @@ export default function DraftPage() {
           }
         />
         <PaginationDots activeDot={hasMessages ? 3 : 2} />
-        {hasMessages && (
+        {(hasMessages || streamingText) && (
           <div
             ref={carouselRef}
             className="mx-4 mt-3 flex overflow-x-auto overflow-y-hidden gap-4 snap-x snap-mandatory scroll-smooth overscroll-x-contain pb-2 -mx-4 px-4 md:mx-auto md:max-w-3xl"
@@ -361,6 +401,18 @@ export default function DraftPage() {
                 />
               </div>
             ))}
+            {streamingText && (
+              <div
+                className="min-w-[85%] max-w-[85%] md:min-w-[420px] md:max-w-[420px] shrink-0 snap-start space-y-2 rounded-lg border border-gray-200 bg-white p-4"
+                role="article"
+                aria-label="AI response in progress"
+              >
+                <p className="text-sm text-[#1B2A4A] whitespace-pre-wrap">
+                  {streamingText}
+                  <span className="animate-pulse" aria-hidden>▋</span>
+                </p>
+              </div>
+            )}
           </div>
         )}
         {allFilled && (

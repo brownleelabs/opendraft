@@ -7,7 +7,7 @@ type ConversationMessage = {
   content: string;
 };
 
-function parseResponse(rawResponse: string): { understood: string; question: string } {
+export function parseResponse(rawResponse: string): { understood: string; question: string } {
   let understood = "";
   let question = "";
   const lines = rawResponse.split(/\r?\n/);
@@ -35,7 +35,7 @@ function parseResponse(rawResponse: string): { understood: string; question: str
  * When in phase 1 with path unrouted, infer path from user input so the returned
  * updatedState has path set and can be persisted correctly by the client.
  */
-function inferPathFromInput(
+export function inferPathFromInput(
   state: GoalTreeState,
   input: string
 ): GoalTreeState {

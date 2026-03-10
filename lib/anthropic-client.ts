@@ -14,6 +14,14 @@ export class AnthropicApiError extends Error {
   }
 }
 
+const conversationParams = (messages: { role: "user" | "assistant"; content: string }[], systemPrompt: string) => ({
+  model: "claude-sonnet-4-6" as const,
+  max_tokens: 1000,
+  cache_control: { type: "ephemeral" as const },
+  system: systemPrompt,
+  messages: messages.map((m) => ({ role: m.role, content: m.content })),
+});
+
 /**
  * Main conversation turn. Uses claude-sonnet-4-6 with prompt caching.
  */
@@ -22,16 +30,7 @@ export async function conversationCall(
   systemPrompt: string
 ): Promise<string> {
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1000,
-      cache_control: { type: "ephemeral" },
-      system: systemPrompt,
-      messages: messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
-    });
+    const response = await anthropic.messages.create(conversationParams(messages, systemPrompt));
 
     for (const block of response.content) {
       if (block.type === "text") {
@@ -45,6 +44,16 @@ export async function conversationCall(
       err instanceof Error ? err.message : "Anthropic API request failed";
     throw new AnthropicApiError(message);
   }
+}
+
+/**
+ * Streaming conversation. Returns a MessageStream; use .on('text', ...) and .finalText().
+ */
+export function conversationStream(
+  messages: { role: "user" | "assistant"; content: string }[],
+  systemPrompt: string
+) {
+  return anthropic.messages.stream(conversationParams(messages, systemPrompt));
 }
 
 /**

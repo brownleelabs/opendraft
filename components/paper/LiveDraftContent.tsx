@@ -51,7 +51,7 @@ function getSlotLabel(path: LiveDraftContentProps["path"], index: number): strin
 export function LiveDraftContent({ state, path }: LiveDraftContentProps) {
   if (path === "unrouted") return null;
 
-  const sections: { label: string; content: string }[] = [];
+  const sections: { label: string; content: string; slotNumber: number }[] = [];
 
   SLOT_KEYS.forEach((key, index) => {
     const slot = state.slots[key];
@@ -63,6 +63,7 @@ export function LiveDraftContent({ state, path }: LiveDraftContentProps) {
       sections.push({
         label: getSlotLabel(path, index),
         content: slot.content,
+        slotNumber: index + 1,
       });
     }
   });
@@ -71,8 +72,13 @@ export function LiveDraftContent({ state, path }: LiveDraftContentProps) {
 
   return (
     <div className="flex flex-col gap-4 font-serif" role="region" aria-label="Draft sections in progress">
-      {sections.map(({ label, content }, i) => (
-        <section key={i} aria-labelledby={`live-draft-heading-${i}`}>
+      {sections.map(({ label, content, slotNumber }, i) => (
+        <section
+          key={slotNumber}
+          className="animate-ink-in"
+          style={{ animationDelay: `${slotNumber * 60}ms` }}
+          aria-labelledby={`live-draft-heading-${i}`}
+        >
           <h3
             id={`live-draft-heading-${i}`}
             className="text-xs font-medium uppercase tracking-wide text-[#2D5016]"

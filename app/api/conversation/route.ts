@@ -1,4 +1,6 @@
-import { processMessage } from "@/lib/conversation-engine";
+import { conversationStream } from "@/lib/anthropic-client";
+import { inferPathFromInput, parseResponse } from "@/lib/conversation-engine";
+import { getSystemPrompt } from "@/lib/system-prompt";
 import type { GoalTreeState } from "@/types";
 
 type ConversationMessage = {
@@ -56,8 +58,38 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { input, state, history } = validateRequestBody(body);
-    const result = await processMessage(input, state, history);
-    return Response.json(result);
+    const systemPrompt = getSystemPrompt();
+    const messages: ConversationMessage[] = [...history, { role: "user", content: input }];
+    const stream = conversationStream(messages, systemPrompt);
+
+    const encoder = new TextEncoder();
+    const readable = new ReadableStream({
+      async start(controller) {
+        stream.on("text", (delta: string) => {
+          controller.enqueue(encoder.encode(delta));
+        });
+        try {
+          const rawResponse = await stream.finalText();
+          const { understood, question } = parseResponse(rawResponse);
+          const updatedState = inferPathFromInput(state, input);
+          const payload = JSON.stringify({
+            understood,
+            question,
+            updatedState,
+            rawResponse,
+          });
+          controller.enqueue(encoder.encode("\n__DONE__" + payload + "\n"));
+        } catch (err) {
+          controller.error(err);
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(readable, {
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   } catch (err) {
     if (err instanceof Error && err.message === "Invalid request body") {
       return Response.json({ error: "Invalid request body" }, { status: 400 });
