@@ -51,8 +51,8 @@ export default async function DraftDetailPage({
 
   const pathLabel = (draft.path ?? "policy") === "policy" ? "POLICY" : "PRODUCT";
   const voteCount = draft.vote_count ?? 0;
-  const publishedAt = draft.published_at ?? "";
-  const formattedDocument = draft.formatted_document ?? "";
+  const publishedAt = draft.published_at ?? new Date().toISOString();
+  const formattedDoc = draft.formatted_document ?? "";
 
   return (
     <>
@@ -71,7 +71,7 @@ export default async function DraftDetailPage({
                 {pathLabel}
               </span>
               <span className="font-sans text-sm text-[#6B7280]">
-                {publishedAt ? `Published ${relativeTime(publishedAt)}` : "Published"}
+                Published {relativeTime(publishedAt)}
               </span>
             </div>
             <h1 className="mt-2 font-serif text-[28px] leading-tight text-[#1B2A4A] md:text-[36px]">
@@ -84,7 +84,7 @@ export default async function DraftDetailPage({
           </header>
 
           <article className="max-w-prose font-sans text-[#1B2A4A] leading-[1.8] whitespace-pre-wrap">
-            {formattedDocument}
+            {formattedDoc}
           </article>
 
           <footer
