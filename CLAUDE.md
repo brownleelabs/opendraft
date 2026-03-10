@@ -431,6 +431,7 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=https://opendraft.dev
+ADMIN_PASSWORD=   # Server-only. Used by app/admin/login for dashboard access. Set in Vercel env vars for production.
 ```
 
 ---
