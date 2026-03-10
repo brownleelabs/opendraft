@@ -142,6 +142,24 @@ export async function fetchDraftById(id: string): Promise<Draft | null> {
 }
 
 /**
+ * Count of rows in drafts (published drafts). Uses anon client.
+ * Same semantics as fetchDrafts — drafts table holds published drafts only.
+ * Returns 0 on any error; must never throw so Screen 1 never breaks.
+ */
+export async function fetchPublishedDraftCount(): Promise<number> {
+  try {
+    const supabase = getClient();
+    const { count, error } = await supabase
+      .from("drafts")
+      .select("*", { count: "exact", head: true });
+    if (error) return 0;
+    return typeof count === "number" ? count : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
  * Fetch all published drafts for the feed with vote counts, ordered by published_at descending.
  */
 export async function fetchDrafts(): Promise<Draft[]> {

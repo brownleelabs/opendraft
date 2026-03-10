@@ -1,11 +1,9 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { InfoModal } from "@/components/modals/InfoModal";
+import { fetchPublishedDraftCount } from "@/lib/supabase-client";
+import { InfoButton } from "@/components/home/InfoButton";
 
-export default function Home() {
-  const [infoOpen, setInfoOpen] = useState(false);
+export default async function Home() {
+  const count = await fetchPublishedDraftCount();
 
   return (
     <div className="flex min-h-dvh flex-col bg-[#FAF8F3]">
@@ -27,14 +25,7 @@ export default function Home() {
           >
             FEED →
           </Link>
-          <button
-            type="button"
-            onClick={() => setInfoOpen(true)}
-            className="flex min-h-[44px] min-w-[44px] flex-shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#1B2A4A] bg-transparent font-sans text-sm font-medium text-[#1B2A4A] transition-colors duration-150 hover:bg-[#1B2A4A] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
-            aria-label="Info"
-          >
-            ?
-          </button>
+          <InfoButton />
         </div>
       </header>
 
@@ -106,12 +97,17 @@ export default function Home() {
         >
           <span className="inline-block skew-x-[6deg] transition-transform duration-200 group-hover:skew-x-[8deg]">CREATE A DRAFT</span>
         </Link>
-        <p className="text-center font-sans text-xs text-[#9CA3AF]">
-          No account required. Your draft is yours.
-        </p>
+        {count === 1 && (
+          <p className="text-center font-sans text-sm text-[#6B7280]">
+            {count} proposal published.
+          </p>
+        )}
+        {count > 1 && (
+          <p className="text-center font-sans text-sm text-[#6B7280]">
+            {count} proposals in the public record.
+          </p>
+        )}
       </footer>
-
-      <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
     </div>
   );
 }
