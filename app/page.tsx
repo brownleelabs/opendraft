@@ -2,42 +2,111 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Paper } from "@/components/paper/Paper";
-import { PaperLines } from "@/components/paper/PaperLines";
-import { PaperScrollContainer } from "@/components/paper/PaperScrollContainer";
-import { BottomNav } from "@/components/shell/BottomNav";
-import { PaginationDots } from "@/components/shell/PaginationDots";
-import { TopNav } from "@/components/shell/TopNav";
-import { Toolbar } from "@/components/toolbar/Toolbar";
 import { InfoModal } from "@/components/modals/InfoModal";
 
 export default function Home() {
   const [infoOpen, setInfoOpen] = useState(false);
 
   return (
-    <>
-      <TopNav onInfoTap={() => setInfoOpen(true)} />
-      {/* pt-20: clear fixed header (14) + GOV.UK-style buffer (~24px) */}
-      <div className="pt-20 pb-14">
-        <Paper variant="compact">
-          <PaperScrollContainer>
-            {/* Screen 1: blank ruled paper only. Onboarding copy lives on /draft (Screen 2). */}
-            <PaperLines />
-          </PaperScrollContainer>
-        </Paper>
-        <Toolbar />
-        <PaginationDots activeDot={1} />
-        <div className="relative z-20 flex justify-center px-4 pt-2">
+    <div className="flex min-h-dvh flex-col bg-[#FAF8F3]">
+      {/* ZONE 1 — TOP (fixed, 60px) */}
+      <header
+        className="fixed left-0 right-0 top-0 z-10 flex h-[60px] items-center justify-between border-b border-[#E8E3D8] bg-[#FAF8F3] px-4"
+        role="banner"
+      >
+        <span
+          className="font-sans text-sm font-semibold tracking-[0.15em] text-[#1B2A4A]"
+          aria-hidden
+        >
+          OPENDRAFT
+        </span>
+        <div className="flex items-center gap-3">
           <Link
-            href="/draft"
-            className="relative z-20 inline-flex min-h-[44px] items-center justify-center rounded-none bg-[#1B2A4A] px-8 py-3 font-sans text-sm font-semibold uppercase tracking-wide text-white shadow-sm transition-transform duration-100 hover:opacity-95 active:scale-[0.98] active:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3] skew-x-[-6deg]"
+            href="/feed"
+            className="font-sans text-sm font-semibold tracking-[0.15em] text-[#1B2A4A] no-underline hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
           >
-            <span className="inline-block skew-x-[6deg]">CREATE A DRAFT</span>
+            FEED →
           </Link>
+          <button
+            type="button"
+            onClick={() => setInfoOpen(true)}
+            className="flex size-7 flex-shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#1B2A4A] bg-transparent font-sans text-sm font-medium text-[#1B2A4A] transition-colors duration-150 hover:bg-[#1B2A4A] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
+            aria-label="Info"
+          >
+            ?
+          </button>
         </div>
-      </div>
-      <BottomNav variant="default" fixed={true} />
+      </header>
+
+      {/* ZONE 2 — HERO (flex-1, centered vertically) */}
+      <main className="flex flex-1 flex-col items-center justify-center px-4 pt-[60px]">
+        <div className="flex w-full max-w-[600px] flex-1 flex-col items-center justify-center gap-12">
+          {/* Statement above the paper */}
+          <div className="flex flex-col items-center gap-2 text-center">
+            <h1 className="font-serif text-[28px] leading-tight text-[#1B2A4A] md:text-[40px]">
+              Turn your idea into a proposal.
+            </h1>
+            <p className="font-sans text-[15px] text-[#6B7280]">
+              For a lawmaker. For a company. In minutes.
+            </p>
+          </div>
+
+          {/* Paper card — not a button, representation of a document */}
+          <div
+            className="relative h-[200px] w-[min(600px,90vw)] rounded-[2px] border border-[#E8E3D8] bg-[#FAF8F3] p-5 shadow-[0_4px_24px_rgba(27,42,74,0.08),0_1px_4px_rgba(27,42,74,0.04)] md:h-[280px] md:p-[20px]"
+            aria-hidden
+          >
+            {/* 12 horizontal ruled lines, evenly spaced; full width minus 40px padding */}
+            <div className="grid h-full grid-rows-12 gap-0">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex min-h-0 items-center border-b border-[#E8E3D8]"
+                  style={{ borderBottomWidth: "1px" }}
+                >
+                  {i === 0 && (
+                    <span className="font-serif text-sm text-[#C8C0B0]">
+                      POLICY PROPOSAL — CITY OF CHICAGO
+                    </span>
+                  )}
+                  {i === 2 && (
+                    <span className="font-serif text-sm text-[#C8C0B0]">
+                      Section 1. The following change is proposed...
+                    </span>
+                  )}
+                  {i === 4 && (
+                    <span className="font-serif text-sm text-[#C8C0B0]">
+                      Whereas the current system fails to address...
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+            {/* DRAFT stamp — bottom-right, rotated -15deg */}
+            <span
+              className="absolute bottom-5 right-6 text-xs font-semibold uppercase tracking-[0.2em] text-[#C8C0B0]"
+              style={{ transform: "rotate(-15deg)" }}
+            >
+              DRAFT
+            </span>
+          </div>
+        </div>
+      </main>
+
+      {/* ZONE 3 — BOTTOM (80px, centered) */}
+      <footer className="flex flex-shrink-0 flex-col items-center justify-center gap-3 pb-8 pt-4">
+        <Link
+          href="/draft"
+          className="group inline-flex min-h-[44px] items-center justify-center border-0 bg-[#1B2A4A] px-12 py-4 font-sans text-sm font-semibold uppercase tracking-[0.1em] text-white no-underline transition-[background-color,transform] duration-200 hover:bg-[#2D5016] hover:[transform:skewX(-8deg)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3] active:scale-[0.98] [transform:skewX(-6deg)]"
+        >
+          <span className="inline-block skew-x-[6deg] transition-transform duration-200 group-hover:skew-x-[8deg]">CREATE A DRAFT</span>
+        </Link>
+        <p className="text-center font-sans text-xs text-[#9CA3AF]">
+          No account required. Your draft is yours.
+        </p>
+      </footer>
+
       <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
-    </>
+    </div>
   );
 }
