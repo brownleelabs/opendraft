@@ -164,11 +164,15 @@ export async function fetchDraftById(id: string): Promise<Draft | null> {
   };
 
   let vote_count = 0;
-  const { data: voteRows } = await supabase
-    .from("votes")
-    .select("value")
-    .eq("draft_id", id);
-  vote_count = (voteRows ?? []).reduce((sum, row) => sum + ((row as { value: number }).value ?? 0), 0);
+  try {
+    const { data: voteRows } = await supabase
+      .from("votes")
+      .select("value")
+      .eq("draft_id", id);
+    vote_count = (voteRows ?? []).reduce((sum, row) => sum + ((row as { value: number }).value ?? 0), 0);
+  } catch {
+    vote_count = 0;
+  }
 
   return {
     id: r.id,
