@@ -348,18 +348,20 @@ export default function DraftPage() {
             </span>
           }
         />
-        <PaginationDots activeDot={3} />
+        <PaginationDots activeDot={hasMessages ? 3 : 2} />
         {hasMessages && (
           <div
             ref={carouselRef}
-            className="mx-4 mt-3 flex overflow-x-auto overflow-y-hidden gap-4 snap-x snap-mandatory scroll-smooth pb-2 -mx-4 px-4 md:mx-auto md:max-w-3xl"
+            className="mx-4 mt-3 flex overflow-x-auto overflow-y-hidden gap-4 snap-x snap-mandatory scroll-smooth overscroll-x-contain pb-2 -mx-4 px-4 md:mx-auto md:max-w-3xl"
             role="region"
-            aria-label="Conversation"
+            aria-label="Conversation exchanges"
           >
             {messages.map((m, i) => (
               <div
                 key={i}
                 className="min-w-[85%] max-w-[85%] md:min-w-[420px] md:max-w-[420px] shrink-0 snap-start space-y-2 rounded-lg border border-gray-200 bg-white p-4"
+                role="article"
+                aria-label={`Exchange ${i + 1} of ${messages.length}`}
               >
                 <p className="text-sm text-[#1B2A4A]">
                   <span className="font-medium">You said:</span> {m.userInput}
@@ -380,6 +382,11 @@ export default function DraftPage() {
               isPublishing={isPublishing}
             />
           </div>
+        )}
+        {isSubmitting && (
+          <p className="px-4 pt-1 text-sm text-[#1B2A4A]/70" role="status" aria-live="polite">
+            Thinking…
+          </p>
         )}
         <InputField
           onSubmit={handleSubmit}

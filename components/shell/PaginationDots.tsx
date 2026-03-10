@@ -22,8 +22,8 @@ export function PaginationDots({ activeDot }: PaginationDotsProps) {
   return (
     <div
       className="flex items-center justify-center gap-2 py-2"
-      role="tablist"
-      aria-label={`Screen ${activeDot} of 3: ${SCREEN_LABELS[activeDot]}. Screen position indicator.`}
+      role="group"
+      aria-label={`Screen ${activeDot} of 3: ${SCREEN_LABELS[activeDot]}. Position indicator.`}
       title={`Screen position: ${SCREEN_LABELS[activeDot]}`}
     >
       <span

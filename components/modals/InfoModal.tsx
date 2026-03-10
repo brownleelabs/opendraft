@@ -54,7 +54,7 @@ export function InfoModal({ open, onClose }: InfoModalProps) {
           <button
             type="button"
             onClick={handleGetStarted}
-            className="w-full rounded-none bg-[#1B2A4A] py-3 font-sans text-sm font-semibold text-white transition-opacity hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-[#1B2A4A] focus:ring-offset-2"
+            className="w-full min-h-[44px] rounded-none bg-[#1B2A4A] py-3 font-sans text-sm font-semibold text-white transition-transform duration-100 hover:opacity-95 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
             Get Started
           </button>

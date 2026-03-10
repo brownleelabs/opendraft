@@ -66,7 +66,7 @@ export function DraftCard({
     <Card>
       <Link
         href={`/feed/${id}`}
-        className="block focus-visible:ring-2 focus-visible:ring-[#2D5016] focus-visible:ring-offset-2 rounded-lg outline-none"
+        className="block rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#2D5016] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
       >
         <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
           <CategoryTag path={path} />

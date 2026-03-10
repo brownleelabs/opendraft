@@ -95,8 +95,25 @@ export function FeedDraftList({ drafts }: FeedDraftListProps) {
     [voteCounts]
   );
 
+  if (drafts.length === 0) {
+    return (
+      <div
+        className="rounded-lg border border-[#E5E5E5] bg-white p-6 text-center"
+        role="status"
+        aria-label="No published drafts yet"
+      >
+        <p className="font-sans text-[#1B2A4A] text-sm">
+          No published drafts yet.
+        </p>
+        <p className="mt-2 font-sans text-[#1B2A4A]/70 text-sm">
+          Create and publish a draft from the home page to see it here.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <ul className="flex flex-col gap-4 list-none p-0 m-0">
+    <ul className="flex flex-col gap-4 list-none p-0 m-0" aria-label="Published drafts">
       {drafts.map((d) => (
         <li key={d.id}>
           <DraftCard

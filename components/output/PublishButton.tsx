@@ -24,7 +24,7 @@ export function PublishButton({
       type="button"
       onClick={onPublish}
       disabled={isPublishing}
-      className="w-full rounded-md bg-[#1B2A4A] text-white hover:bg-[#1B2A4A]/90 transition-transform duration-100 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2"
+      className="min-h-[44px] w-full rounded-md bg-[#1B2A4A] text-white hover:bg-[#1B2A4A]/90 transition-transform duration-100 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
     >
       {isPublishing ? "Publishing..." : "PUBLISH DRAFT"}
     </Button>

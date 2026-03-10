@@ -70,15 +70,15 @@ export function LiveDraftContent({ state, path }: LiveDraftContentProps) {
   if (sections.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-4 font-serif">
+    <div className="flex flex-col gap-4 font-serif" role="region" aria-label="Draft sections in progress">
       {sections.map(({ label, content }, i) => (
-        <div key={i}>
-          <div
+        <section key={i} aria-labelledby={`live-draft-heading-${i}`}>
+          <h3
+            id={`live-draft-heading-${i}`}
             className="text-xs font-medium uppercase tracking-wide text-[#2D5016]"
-            aria-label={label}
           >
             {label}
-          </div>
+          </h3>
           <p className="mt-1 text-[#1B2A4A]">{content}</p>
           {i < sections.length - 1 && (
             <div
@@ -86,7 +86,7 @@ export function LiveDraftContent({ state, path }: LiveDraftContentProps) {
               aria-hidden
             />
           )}
-        </div>
+        </section>
       ))}
     </div>
   );

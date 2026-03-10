@@ -60,14 +60,18 @@ export function ProgressChartModal({
           <p className="text-sm text-[#1B2A4A]/80">
             {filledCount} of 7 sections complete
           </p>
-          <div className="h-2 w-full overflow-hidden rounded-sm bg-[#FAF8F3]">
+          <div
+            className="h-2 w-full overflow-hidden rounded-sm bg-[#FAF8F3]"
+            role="progressbar"
+            aria-valuenow={percentComplete}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Draft completion progress"
+          >
             <div
               className="h-full bg-[#1B2A4A] transition-[width] duration-200"
               style={{ width: `${percentComplete}%` }}
-              role="progressbar"
-              aria-valuenow={percentComplete}
-              aria-valuemin={0}
-              aria-valuemax={100}
+              aria-hidden
             />
           </div>
           <p className="text-center text-sm text-[#1B2A4A]/80">

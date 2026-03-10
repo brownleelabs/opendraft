@@ -68,7 +68,6 @@ export function InputField({
             "min-h-16 flex-1 border-[#2D5016] placeholder:text-[#2D5016]/60 focus-visible:border-[#3a6b1c] focus-visible:ring-[#2D5016]/20",
             isActive && "border-[#3a6b1c]"
           )}
-          aria-label={placeholder}
         />
         <button
           type="button"

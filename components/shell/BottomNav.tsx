@@ -11,8 +11,9 @@ interface BottomNavProps {
 }
 
 const iconClassName = "size-6 text-[#1B2A4A]";
+/* GOV.UK / ADA: min 44px touch target */
 const linkClass =
-  "flex size-10 items-center justify-center rounded-md transition-transform duration-100 hover:opacity-90 active:scale-[0.98] active:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]";
+  "flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md transition-transform duration-100 hover:opacity-90 active:scale-[0.98] active:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]";
 
 /**
  * Fixed bottom nav. Two variants:

@@ -12,7 +12,7 @@ export function MemoryButton({ onTap, activeSlots }: MemoryButtonProps) {
     <button
       type="button"
       onClick={onTap}
-      className="relative flex h-8 w-8 items-center justify-center -m-1.5 rounded-md border-0 bg-transparent p-0 text-[#1B2A4A] transition-transform duration-100 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+      className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border-0 bg-transparent p-0 text-[#1B2A4A] transition-transform duration-100 hover:opacity-90 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
       aria-label="View goal tree"
     >
       {activeSlots > 0 && (
