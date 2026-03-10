@@ -42,18 +42,18 @@ export function InfoModal({ open, onClose }: InfoModalProps) {
         </SheetHeader>
         <div className="flex flex-col gap-4 px-4 pb-6">
           <p className="text-sm text-[#1B2A4A]">
-            OpenDraft helps you turn a raw idea into a structured proposal —
-            either a bill for your representative or a feature request for a
-            company.
+            Most good ideas never reach the right person. Not because
+            they&apos;re bad ideas — because they&apos;re never written down
+            clearly enough to act on.
           </p>
           <p className="text-sm text-[#1B2A4A]">
-            You describe what you want to change. We ask questions until the
-            idea is specific enough to act on. The result is a formatted
-            document that gets sent to the right person.
+            OpenDraft asks you questions until your idea becomes a
+            structured proposal. Policy path sends it toward a lawmaker.
+            Product path sends it toward a company. Either way, you wrote it.
           </p>
           <p className="text-sm text-[#1B2A4A]">
-            Every published draft is public. Others can read and vote on it. The
-            more support a draft gets, the more times it gets sent.
+            Every published draft is in the public record.
+            Anyone can read it. Anyone can vote on it.
           </p>
           <button
             type="button"

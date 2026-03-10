@@ -399,33 +399,37 @@ export default function DraftPage() {
         {(hasMessages || streamingText) && (
           <div
             ref={carouselRef}
-            className="mx-4 mt-3 flex overflow-x-auto overflow-y-hidden gap-4 snap-x snap-mandatory scroll-smooth overscroll-x-contain pb-2 -mx-4 px-4 md:mx-auto md:max-w-3xl"
+            className="mx-4 mt-3 flex overflow-x-auto overflow-y-hidden gap-5 snap-x snap-mandatory scroll-smooth overscroll-x-contain pb-2 -mx-4 px-4 md:mx-auto md:max-w-3xl"
             role="region"
             aria-label="Conversation exchanges"
           >
             {messages.map((m, i) => (
               <div
                 key={i}
-                className="animate-ink-in min-w-[85%] max-w-[85%] shrink-0 snap-start space-y-2 rounded-[2px] border border-[#E8E3D8] bg-white p-4 md:min-w-[420px] md:max-w-[420px]"
+                className="animate-ink-in flex min-w-[85%] max-w-[85%] shrink-0 snap-start flex-col gap-5 md:min-w-[420px] md:max-w-[420px]"
                 role="article"
                 aria-label={`Exchange ${i + 1} of ${messages.length}`}
               >
-                <p className="text-sm text-[#1B2A4A]">
-                  <span className="font-medium">You said:</span> {m.userInput}
-                </p>
-                <AIResponseBlock
-                  understood={m.understood}
-                  question={m.question}
-                />
+                <div className="flex justify-end text-right border-r-2 border-[#1B2A4A] pr-3">
+                  <p className="font-sans text-sm font-medium text-[#1B2A4A]">
+                    <span className="font-medium">You said:</span> {m.userInput}
+                  </p>
+                </div>
+                <div className="flex justify-start text-left border-l-2 border-[#E8E3D8] pl-3 font-sans text-sm leading-7 text-[#4B5563] [&>div]:border-0 [&>div]:bg-transparent [&>div]:p-0 [&>div]:shadow-none [&_p]:text-[#4B5563] [&_span]:text-[#4B5563]">
+                  <AIResponseBlock
+                    understood={m.understood}
+                    question={m.question}
+                  />
+                </div>
               </div>
             ))}
             {streamingText && (
               <div
-                className="min-w-[85%] max-w-[85%] shrink-0 snap-start space-y-2 rounded-[2px] border border-[#E8E3D8] bg-white p-4 md:min-w-[420px] md:max-w-[420px]"
+                className="flex min-w-[85%] max-w-[85%] shrink-0 snap-start justify-start text-left border-l-2 border-[#E8E3D8] pl-3 md:min-w-[420px] md:max-w-[420px]"
                 role="article"
                 aria-label="AI response in progress"
               >
-                <p className="text-sm text-[#1B2A4A] whitespace-pre-wrap">
+                <p className="font-sans text-sm leading-7 text-[#4B5563] whitespace-pre-wrap">
                   {streamingText.includes("```")
                     ? streamingText.slice(0, streamingText.indexOf("```")).trimEnd()
                     : streamingText}
