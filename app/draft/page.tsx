@@ -8,7 +8,6 @@ import { InputField } from "@/components/conversation/InputField";
 import { Paper } from "@/components/paper/Paper";
 import { LiveDraftContent } from "@/components/paper/LiveDraftContent";
 import { PaperLines } from "@/components/paper/PaperLines";
-import { PaperOnboardingCopy } from "@/components/paper/PaperOnboardingCopy";
 import { PaperScrollContainer } from "@/components/paper/PaperScrollContainer";
 import { BottomNav } from "@/components/shell/BottomNav";
 import { PaginationDots } from "@/components/shell/PaginationDots";
@@ -354,8 +353,14 @@ export default function DraftPage() {
               <div className="absolute inset-0 z-0 min-h-full" aria-hidden>
                 <PaperLines />
               </div>
-              <div className="relative z-10">
-                {!hasMessages && <PaperOnboardingCopy />}
+              <div className="relative z-10 min-h-full">
+                {!hasMessages && (
+                  <div className="flex min-h-full flex-col items-center justify-center px-4">
+                    <p className="font-serif text-2xl text-[#1B2A4A] text-center">
+                      What do you want to change?
+                    </p>
+                  </div>
+                )}
                 {hasMessages && (
                   <>
                     <LiveDraftContent state={state} path={state.path} />
