@@ -92,7 +92,7 @@ export function FeedDraftList({ drafts }: FeedDraftListProps) {
   if (drafts.length === 0) {
     return (
       <div
-        className="rounded-lg border border-[#E5E5E5] bg-white p-6 text-center"
+        className="rounded-[2px] border border-[#E8E3D8] bg-white p-6 text-center"
         role="status"
         aria-label="No published drafts yet"
       >

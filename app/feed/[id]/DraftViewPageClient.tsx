@@ -43,7 +43,7 @@ export function DraftViewPageClient({ draft }: DraftViewPageClientProps) {
           <h1 className="mt-2 font-serif text-[#1B2A4A] text-xl font-semibold">
             {draft.title}
           </h1>
-          <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 font-serif text-[#1B2A4A] whitespace-pre-wrap">
+          <div className="mt-6 rounded-[2px] border border-[#E8E3D8] bg-white p-6 font-serif text-[#1B2A4A] whitespace-pre-wrap">
             {draft.formatted_document}
           </div>
         </div>

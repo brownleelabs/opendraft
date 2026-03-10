@@ -397,7 +397,7 @@ export default function DraftPage() {
             {messages.map((m, i) => (
               <div
                 key={i}
-                className="min-w-[85%] max-w-[85%] md:min-w-[420px] md:max-w-[420px] shrink-0 snap-start space-y-2 rounded-lg border border-gray-200 bg-white p-4"
+                className="animate-ink-in min-w-[85%] max-w-[85%] shrink-0 snap-start space-y-2 rounded-[2px] border border-[#E8E3D8] bg-white p-4 md:min-w-[420px] md:max-w-[420px]"
                 role="article"
                 aria-label={`Exchange ${i + 1} of ${messages.length}`}
               >
@@ -412,7 +412,7 @@ export default function DraftPage() {
             ))}
             {streamingText && (
               <div
-                className="min-w-[85%] max-w-[85%] md:min-w-[420px] md:max-w-[420px] shrink-0 snap-start space-y-2 rounded-lg border border-gray-200 bg-white p-4"
+                className="min-w-[85%] max-w-[85%] shrink-0 snap-start space-y-2 rounded-[2px] border border-[#E8E3D8] bg-white p-4 md:min-w-[420px] md:max-w-[420px]"
                 role="article"
                 aria-label="AI response in progress"
               >
@@ -438,6 +438,7 @@ export default function DraftPage() {
           <InputField
             onSubmit={handleSubmit}
             disabled={isSubmitting}
+            isSubmitting={isSubmitting}
             placeholder={
               messages.length > 0 ? "Enter your answer here" : undefined
             }

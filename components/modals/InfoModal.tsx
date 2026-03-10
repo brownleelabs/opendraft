@@ -30,7 +30,11 @@ export function InfoModal({ open, onClose }: InfoModalProps) {
         if (!value) onClose();
       }}
     >
-      <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
+      <SheetContent
+        side="bottom"
+        overlayClassName="bg-black/30 animate-fade-in"
+        className="max-h-[85vh] overflow-y-auto"
+      >
         <SheetHeader>
           <SheetTitle className="text-[#1B2A4A]">
             What is OpenDraft?
@@ -54,7 +58,7 @@ export function InfoModal({ open, onClose }: InfoModalProps) {
           <button
             type="button"
             onClick={handleGetStarted}
-            className="w-full min-h-[44px] rounded-none bg-[#1B2A4A] py-3 font-sans text-sm font-semibold text-white transition-transform duration-100 hover:opacity-95 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            className="min-h-[44px] w-full border-0 bg-[#1B2A4A] py-3 font-sans text-sm font-semibold uppercase text-white transition-colors duration-200 hover:bg-[#2D5016] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.98]"
           >
             Get Started
           </button>

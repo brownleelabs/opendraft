@@ -41,8 +41,11 @@ export default function Home() {
       {/* ZONE 2 — HERO (flex-1, centered vertically) */}
       <main className="flex flex-1 flex-col items-center justify-center px-4 pt-[60px]">
         <div className="flex w-full max-w-[600px] flex-1 flex-col items-center justify-center gap-12">
-          {/* Statement above the paper */}
-          <div className="flex flex-col items-center gap-2 text-center">
+          {/* Statement above the paper — animate-ink-in delay 100ms */}
+          <div
+            className="animate-ink-in flex flex-col items-center gap-2 text-center opacity-0"
+            style={{ animationDelay: "100ms", animationFillMode: "forwards" }}
+          >
             <h1 className="font-serif text-[28px] leading-tight text-[#1B2A4A] md:text-[40px]">
               Turn your idea into a proposal.
             </h1>
@@ -51,9 +54,10 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Paper card — not a button, representation of a document */}
+          {/* Paper card — animate-slide-up delay 0ms */}
           <div
-            className="relative h-[200px] w-[min(600px,90vw)] rounded-[2px] border border-[#E8E3D8] bg-[#FAF8F3] p-5 shadow-[0_4px_24px_rgba(27,42,74,0.08),0_1px_4px_rgba(27,42,74,0.04)] md:h-[280px] md:p-[20px]"
+            className="animate-slide-up relative h-[200px] w-[min(600px,90vw)] rounded-[2px] border border-[#E8E3D8] bg-[#FAF8F3] p-5 opacity-0 shadow-[0_4px_24px_rgba(27,42,74,0.08),0_1px_4px_rgba(27,42,74,0.04)] md:h-[280px] md:p-[20px]"
+            style={{ animationDelay: "0ms", animationFillMode: "forwards" }}
             aria-hidden
           >
             {/* 12 horizontal ruled lines, evenly spaced; full width minus 40px padding */}
@@ -93,11 +97,12 @@ export default function Home() {
         </div>
       </main>
 
-      {/* ZONE 3 — BOTTOM (80px, centered) */}
+      {/* ZONE 3 — BOTTOM — CTA animate-ink-in delay 250ms */}
       <footer className="flex flex-shrink-0 flex-col items-center justify-center gap-3 pb-8 pt-4">
         <Link
           href="/draft"
-          className="group inline-flex min-h-[44px] items-center justify-center border-0 bg-[#1B2A4A] px-12 py-4 font-sans text-sm font-semibold uppercase tracking-[0.1em] text-white no-underline transition-[background-color,transform] duration-200 hover:bg-[#2D5016] hover:[transform:skewX(-8deg)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3] active:scale-[0.98] [transform:skewX(-6deg)]"
+          className="animate-ink-in group inline-flex min-h-[44px] items-center justify-center border-0 bg-[#1B2A4A] px-12 py-4 font-sans text-sm font-semibold uppercase tracking-[0.1em] text-white no-underline opacity-0 transition-[background-color,transform] duration-200 hover:bg-[#2D5016] hover:[transform:skewX(-8deg)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3] active:scale-[0.98] [transform:skewX(-6deg)]"
+          style={{ animationDelay: "250ms", animationFillMode: "forwards" }}
         >
           <span className="inline-block skew-x-[6deg] transition-transform duration-200 group-hover:skew-x-[8deg]">CREATE A DRAFT</span>
         </Link>
