@@ -18,9 +18,10 @@ const TOTAL_SLOTS = 7;
 export function useSlotTracker(state: GoalTreeState) {
   return useMemo(() => {
     const slotStatuses: SlotStatus[] = SLOT_KEYS.map((key) => state.slots[key]);
-    const filledCount = slotStatuses.filter(
-      (s) => s.status === "filled"
+    const slotsFilledCount = Object.values(state.slots ?? {}).filter(
+      (s) => s.status === "filled" || s.status === "partial"
     ).length;
+    const filledCount = slotsFilledCount;
     const percentComplete = Math.round((filledCount / TOTAL_SLOTS) * 100);
 
     let currentSlot = TOTAL_SLOTS;
@@ -34,12 +35,14 @@ export function useSlotTracker(state: GoalTreeState) {
       }
     }
 
+    const allFilled = slotStatuses.every((s) => s.status === "filled");
+
     return {
       filledCount,
       totalSlots: TOTAL_SLOTS,
       percentComplete,
       currentSlot,
-      allFilled: filledCount === TOTAL_SLOTS,
+      allFilled,
       slotStatuses,
     };
   }, [state]);

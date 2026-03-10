@@ -131,10 +131,12 @@ function isValidSlotStatus(s: unknown): s is { status: string; content: unknown 
 function isValidGoalTreeState(state: unknown): state is GoalTreeState {
   if (typeof state !== "object" || state === null) return false;
   const o = state as Record<string, unknown>;
-  if (!o.slots || typeof o.slots !== "object") return false;
-  const slots = o.slots as Record<string, unknown>;
-  for (const key of SLOT_KEYS) {
-    if (!isValidSlotStatus(slots[key])) return false;
+  // Slots optional for backwards compatibility with existing sessions
+  if (o.slots !== undefined && o.slots !== null && typeof o.slots === "object") {
+    const slots = o.slots as Record<string, unknown>;
+    for (const key of SLOT_KEYS) {
+      if (!isValidSlotStatus(slots[key])) return false;
+    }
   }
   return true;
 }
@@ -419,7 +421,9 @@ export default function DraftPage() {
                 aria-label="AI response in progress"
               >
                 <p className="text-sm text-[#1B2A4A] whitespace-pre-wrap">
-                  {streamingText}
+                  {streamingText.includes("```")
+                    ? streamingText.slice(0, streamingText.indexOf("```")).trimEnd()
+                    : streamingText}
                   <span className="animate-pulse" aria-hidden>▋</span>
                 </p>
               </div>
