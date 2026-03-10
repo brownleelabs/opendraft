@@ -10,6 +10,9 @@ import { OverviewStats } from "@/components/admin/OverviewStats";
 import { DropOffFunnel } from "@/components/admin/DropOffFunnel";
 import { SlotDifficulty } from "@/components/admin/SlotDifficulty";
 import { PathDistribution } from "@/components/admin/PathDistribution";
+import { FeedHealth } from "@/components/admin/FeedHealth";
+import { RecentSessions } from "@/components/admin/RecentSessions";
+import { fetchSessionEvents } from "@/app/admin/actions";
 
 const sectionHeaderClass =
   "mb-4 border-b border-[#E5E7EB] pb-2 text-xs font-medium uppercase tracking-widest text-[#1B2A4A]";
@@ -40,6 +43,12 @@ export default async function AdminDashboardPage() {
 
       <h2 className={`mt-10 ${sectionHeaderClass}`}>PATH DISTRIBUTION</h2>
       <PathDistribution distribution={pathDistribution} />
+
+      <h2 className={`mt-10 ${sectionHeaderClass}`}>FEED HEALTH</h2>
+      <FeedHealth health={feedHealth} />
+
+      <h2 className={`mt-10 ${sectionHeaderClass}`}>RECENT SESSIONS (LAST 20)</h2>
+      <RecentSessions sessions={recentSessions} getEvents={fetchSessionEvents} />
     </>
   );
 }
