@@ -13,13 +13,11 @@ import { PaperScrollContainer } from "@/components/paper/PaperScrollContainer";
 import { BottomNav } from "@/components/shell/BottomNav";
 import { PaginationDots } from "@/components/shell/PaginationDots";
 import { TopNav } from "@/components/shell/TopNav";
-import { LikelihoodBadge } from "@/components/toolbar/LikelihoodBadge";
 import { MemoryButton } from "@/components/toolbar/MemoryButton";
 import { ProgressButton } from "@/components/toolbar/ProgressButton";
 import { Toolbar } from "@/components/toolbar/Toolbar";
 import { User } from "lucide-react";
 import { GoalTreeModal } from "@/components/modals/GoalTreeModal";
-import { LikelihoodDetailPanel } from "@/components/modals/LikelihoodDetailPanel";
 import { ProgressChartModal } from "@/components/modals/ProgressChartModal";
 import { InfoModal } from "@/components/modals/InfoModal";
 import { DraftDocument } from "@/components/output/DraftDocument";
@@ -165,11 +163,9 @@ export default function DraftPage() {
   const [history, setHistory] = useState<ConversationMessage[]>([]);
   const [goalTreeOpen, setGoalTreeOpen] = useState(false);
   const [progressOpen, setProgressOpen] = useState(false);
-  const [likelihoodOpen, setLikelihoodOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [likelihoodScore] = useState(24);
   const { filledCount, percentComplete, allFilled } = useSlotTracker(state);
 
   const handlePublish = useCallback(async () => {
@@ -319,13 +315,6 @@ export default function DraftPage() {
         </Paper>
         {/* Toolbar and pagination attached directly below paper */}
         <Toolbar
-          left={
-            <LikelihoodBadge
-              score={Math.round(likelihoodScore)}
-              visible={true}
-              onTap={() => setLikelihoodOpen(true)}
-            />
-          }
           centerLeft={
             <MemoryButton
               onTap={() => setGoalTreeOpen(true)}
@@ -409,12 +398,6 @@ export default function DraftPage() {
         onClose={() => setProgressOpen(false)}
         filledCount={filledCount}
         percentComplete={percentComplete}
-        path={state.path}
-      />
-      <LikelihoodDetailPanel
-        open={likelihoodOpen}
-        onClose={() => setLikelihoodOpen(false)}
-        score={24}
         path={state.path}
       />
       <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
