@@ -57,6 +57,17 @@ These files exist in the project root and contain the full product specification
 
 ---
 
+## Architecture
+
+### Telemetry & Admin
+- Events are written via POST /api/log-event (server route, service role).
+- Admin dashboard lives at /admin — password protected, server components only except RecentSessions (client, for expand/collapse).
+- Analytics queries live in lib/analytics.ts — server-only.
+- Weekly report available at GET /api/admin/report.
+- Server action for session events: app/admin/actions.ts.
+
+---
+
 ## Design System
 
 ### Color Palette
@@ -431,8 +442,11 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=https://opendraft.dev
-ADMIN_PASSWORD=   # Server-only. Used by app/admin/login for dashboard access. Set in Vercel env vars for production.
+ADMIN_PASSWORD=
 ```
+
+- **SUPABASE_SERVICE_ROLE_KEY** — server-only. Used by lib/supabase-server.ts and app/api/log-event/route.ts. Never expose to client.
+- **ADMIN_PASSWORD** — server-only. Used by app/admin/login/page.tsx. Never expose to client. Set in Vercel env vars for production.
 
 ---
 
@@ -514,6 +528,18 @@ Be ruthless about scope. These ship after v1.
 
 ---
 
+## v1.5 Status
+Playbook 6 complete. Events pipeline live. Admin dashboard live.
+Feedback loop: Ship → Supabase events → /admin weekly review → Download report → Drop into Cursor → Improve system prompt → Deploy.
+
+---
+
+## Parking Lot
+- **Routing heuristic coverage:** Add 'legislative', 'law', 'regulation', 'ordinance' to policy keywords and 'startup', 'platform', 'tool', 'build' to product keywords in lib/conversation-engine.ts.
+- **AI-owned routing (Playbook 7):** Make conversation engine return path as an explicit field in the AI response JSON — replace inferPathFromInput keyword heuristic entirely.
+
+---
+
 ## Open Questions (Unresolved — Do Not Guess)
 
 These are actively unresolved design decisions. Do not invent answers. Flag them and ask.
@@ -540,4 +566,4 @@ When the build gets complicated, come back to that sentence.
 *Project: OpenDraft*
 *Domain: opendraft.dev*
 *Owner: Andrew Brownlee / Offbeat Options LLC*
-*Last updated: March 8, 2026*
+*Last updated: March 9, 2026*

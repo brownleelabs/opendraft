@@ -244,13 +244,11 @@ export default function DraftPage() {
           { role: "user", content: input, timestamp: now },
           { role: "assistant", content: rawResponse, timestamp: now },
         ];
-        const pathToSave = updatedState.path === "unrouted" ? null : updatedState.path;
-        console.log("[saveConversation] path being passed:", pathToSave);
         saveConversation(
           sessionId,
           updatedState,
           historyForSave,
-          pathToSave
+          updatedState.path === "unrouted" ? null : updatedState.path
         ).catch((err) => console.error("Auto-save failed:", err));
 
         // Log session_started on first message only
