@@ -6,6 +6,11 @@ import {
   getFeedHealth,
   getRecentSessions,
 } from "@/lib/analytics";
+import { OverviewStats } from "@/components/admin/OverviewStats";
+import { DropOffFunnel } from "@/components/admin/DropOffFunnel";
+
+const sectionHeaderClass =
+  "mb-4 border-b border-[#E5E7EB] pb-2 text-xs font-medium uppercase tracking-widest text-[#1B2A4A]";
 
 export default async function AdminDashboardPage() {
   const [overviewStats, funnelStages, slotDifficulty, pathDistribution, feedHealth, recentSessions] =
@@ -18,21 +23,15 @@ export default async function AdminDashboardPage() {
       getRecentSessions(20),
     ]);
 
-  const data = {
-    overviewStats,
-    funnelStages,
-    slotDifficulty,
-    pathDistribution,
-    feedHealth,
-    recentSessions,
-  };
-
   return (
     <>
-      <p className="mb-4 text-[#6B7280]">Data as of {new Date().toISOString()}</p>
-      <pre className="overflow-auto rounded border border-[#E5E7EB] bg-[#FAF8F3] p-4 text-sm text-[#1B2A4A]">
-        {JSON.stringify(data, null, 2)}
-      </pre>
+      <p className="mb-6 text-[#6B7280]">Data as of {new Date().toISOString()}</p>
+
+      <h2 className={sectionHeaderClass}>OVERVIEW</h2>
+      <OverviewStats stats={overviewStats} />
+
+      <h2 className={`mt-10 ${sectionHeaderClass}`}>DROP-OFF FUNNEL</h2>
+      <DropOffFunnel stages={funnelStages} />
     </>
   );
 }
