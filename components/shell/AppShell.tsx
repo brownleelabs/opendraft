@@ -22,7 +22,7 @@ export function AppShell({ children }: AppShellProps) {
         {/* TopNav slot */}
         <header className="flex-shrink-0" aria-label="Top navigation" />
         {/* Main content */}
-        <main id="main-content" className="min-h-0 flex-1 overflow-auto" tabIndex={-1}>
+        <main id="main-content" className="page-enter min-h-0 flex-1 overflow-x-hidden overflow-y-auto" tabIndex={-1}>
           {children}
         </main>
         {/* BottomNav slot — fixed at bottom of viewport */}

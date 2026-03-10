@@ -64,7 +64,7 @@ export function LikelihoodDetailPanel({
               ))}
             </ul>
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-[#6B7280]">
             Score updates as you answer more questions.
           </p>
         </div>

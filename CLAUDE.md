@@ -18,6 +18,25 @@ The core mechanic is Socratic AI interrogation. The AI never generates ideas. It
 
 ---
 
+## Demo Path
+
+**CANONICAL DEMO FLOW (on phone):**
+1. Open opendraft.dev
+2. Tap "CREATE A DRAFT"
+3. Type: "I want Chicago to require landlords to disclose pending demolition permits before signing leases"
+4. Follow the AI through 7 questions
+5. Watch the paper fill in real time
+6. Tap "PUBLISH DRAFT"
+7. Show the feed — draft is live
+
+**TALKING POINTS:**
+- "The AI never writes for you — it asks questions until you've written it yourself"
+- "Every published draft is a structured proposal ready to send to a real person"
+- "The feed is a public record of civic ideas"
+- "We track every session — which slots cause drop-off, which path users choose, how long it takes"
+
+---
+
 ## The Founder
 
 Andrew Brownlee. IBM Strategic Account Manager (HashiCorp portfolio — Vault, Terraform, Boundary). Previously: Corporate Account Manager at HashiCorp/IBM (123% attainment), Google Small Business Account Manager (108% attainment, $2M quota, Gemini AI adoption focus), MongoDB Associate AE (114% attainment, Verizon and Disney accounts). Apple Genius Bar background. University of Toledo. 500+ LinkedIn connections.
@@ -534,9 +553,19 @@ Feedback loop: Ship → Supabase events → /admin weekly review → Download re
 
 ---
 
+## v2.0 Status
+Playbook 7 complete. Product is demo-ready.
+Streaming responses, animated paper, progress bar, completion moment, feed redesign, micro-interactions, mobile responsive.
+
+---
+
 ## Parking Lot
 - **Routing heuristic coverage:** Add 'legislative', 'law', 'regulation', 'ordinance' to policy keywords and 'startup', 'platform', 'tool', 'build' to product keywords in lib/conversation-engine.ts.
 - **AI-owned routing (Playbook 7):** Make conversation engine return path as an explicit field in the AI response JSON — replace inferPathFromInput keyword heuristic entirely.
+- **Draft restoration:** Resume prior session (requires Supabase state persistence by sessionId).
+- **PDF download:** Wire disabled button in CompletionPanel.
+- **Draft detail page:** /feed/[id] with full document.
+- **CRITICAL — Slot filling:** Conversation engine returns path/phase but not updated slot statuses; slots never reach 'filled' state in production. Fix: processMessage must return updatedState with slot statuses populated. This blocks ProgressBar, ink-in animations, and CompletionPanel from firing on real sessions. P0 for Playbook 8.
 
 ---
 
