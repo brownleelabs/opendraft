@@ -30,7 +30,15 @@ export default async function AdminDashboardPage() {
 
   return (
     <>
-      <p className="mb-6 text-[#6B7280]">Data as of {new Date().toISOString()}</p>
+      <div className="mb-6 flex items-center justify-between">
+        <p className="text-[#6B7280]">Data as of {new Date().toISOString()}</p>
+        <a
+          href="/api/admin/report"
+          className="bg-[#1B2A4A] px-3 py-1.5 text-sm text-white hover:opacity-90"
+        >
+          Download Weekly Report ↓
+        </a>
+      </div>
 
       <h2 className={sectionHeaderClass}>OVERVIEW</h2>
       <OverviewStats stats={overviewStats} />
