@@ -31,8 +31,40 @@ function assertValidSessionId(sessionId: string): void {
   }
 }
 
+const SLOT_KEYS = ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7"] as const;
+
+/** Count slots with status filled or partial (same logic as slot-tracker). */
+function slotsFilledCount(slots: GoalTreeState["slots"] | null | undefined): number {
+  if (!slots || typeof slots !== "object") return 0;
+  return Object.values(slots).filter(
+    (s) => s?.status === "filled" || s?.status === "partial"
+  ).length;
+}
+
+/** True when all 7 slots have status === "filled". */
+function isCompleted(slots: GoalTreeState["slots"] | null | undefined): boolean {
+  if (!slots || typeof slots !== "object") return false;
+  return SLOT_KEYS.every((key) => slots[key]?.status === "filled");
+}
+
+/** Highest slot number (1–7) with partial or filled; null if none or completed. */
+function abandonedAtSlot(
+  slots: GoalTreeState["slots"] | null | undefined,
+  completed: boolean
+): number | null {
+  if (completed || !slots || typeof slots !== "object") return null;
+  let last = 0;
+  for (let i = 0; i < SLOT_KEYS.length; i++) {
+    const s = slots[SLOT_KEYS[i]];
+    if (s?.status === "filled" || s?.status === "partial") last = i + 1;
+  }
+  return last > 0 ? last : null;
+}
+
 /**
  * Save or update a conversation session (upsert by session_id).
+ * Persists full goal_tree_state (including slot status and content), slots_filled,
+ * completed, and abandoned_at_slot for admin and analytics.
  */
 export async function saveConversation(
   sessionId: string,
@@ -41,6 +73,11 @@ export async function saveConversation(
   path: string | null
 ): Promise<void> {
   assertValidSessionId(sessionId);
+  const slots = goalTreeState.slots;
+  const filled = slotsFilledCount(slots);
+  const completed = isCompleted(slots);
+  const abandoned = abandonedAtSlot(slots, completed);
+
   try {
     const supabase = getClient();
     const row = {
@@ -49,6 +86,9 @@ export async function saveConversation(
       message_history: messageHistory as unknown as unknown[],
       path,
       updated_at: new Date().toISOString(),
+      slots_filled: filled,
+      completed,
+      abandoned_at_slot: abandoned,
     };
     const { error } = await supabase
       .from("conversations")

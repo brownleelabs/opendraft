@@ -559,13 +559,19 @@ Streaming responses, animated paper, progress bar, completion moment, feed redes
 
 ---
 
+## v2.1 Status
+Playbook 8 complete. Core mechanic restored.
+Slot filling wired end-to-end. Draft detail page live.
+Feed seeded. Screen 1 proof of life.
+Conversation UI redesigned. InfoModal copy sharpened.
+
+---
+
 ## Parking Lot
 - **Routing heuristic coverage:** Add 'legislative', 'law', 'regulation', 'ordinance' to policy keywords and 'startup', 'platform', 'tool', 'build' to product keywords in lib/conversation-engine.ts.
 - **AI-owned routing (Playbook 7):** Make conversation engine return path as an explicit field in the AI response JSON — replace inferPathFromInput keyword heuristic entirely.
 - **Draft restoration:** Resume prior session (requires Supabase state persistence by sessionId).
 - **PDF download:** Wire disabled button in CompletionPanel.
-- **Draft detail page:** /feed/[id] with full document.
-- **CRITICAL — Slot filling:** Conversation engine returns path/phase but not updated slot statuses; slots never reach 'filled' state in production. Fix: processMessage must return updatedState with slot statuses populated. This blocks ProgressBar, ink-in animations, and CompletionPanel from firing on real sessions. P0 for Playbook 8.
 
 ---
 
