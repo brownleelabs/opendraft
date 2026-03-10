@@ -146,6 +146,18 @@
   animation: paper-pulse 0.7s ease-out;
 }
 
+@keyframes publish-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.publish-overlay-in {
+  animation: publish-overlay-in 0.3s ease-out forwards;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

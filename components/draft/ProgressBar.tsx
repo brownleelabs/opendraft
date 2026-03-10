@@ -20,8 +20,8 @@ export function ProgressBar({ slotsFilledCount, path }: ProgressBarProps) {
     >
       <div className="flex flex-row items-center gap-1">
         {[1, 2, 3, 4, 5, 6, 7].map((i) => {
-          const filled = i < n;
-          const current = n < 7 ? i === n : i === 7;
+          const filled = i <= n;
+          const current = (n < 7 && i === n) || (n === 7 && i === 7);
           return (
             <div
               key={i}

@@ -20,9 +20,9 @@ import { User } from "lucide-react";
 import { GoalTreeModal } from "@/components/modals/GoalTreeModal";
 import { ProgressChartModal } from "@/components/modals/ProgressChartModal";
 import { InfoModal } from "@/components/modals/InfoModal";
+import { CompletionPanel } from "@/components/draft/CompletionPanel";
 import { ProgressBar } from "@/components/draft/ProgressBar";
 import { DraftDocument } from "@/components/output/DraftDocument";
-import { PublishButton } from "@/components/output/PublishButton";
 import { useSlotTracker } from "@/lib/slot-tracker";
 import { logEvent, saveConversation } from "@/lib/supabase-client";
 import type { ConversationMessage as ApiConversationMessage, GoalTreeState } from "@/types";
@@ -166,14 +166,18 @@ export default function DraftPage() {
   const [progressOpen, setProgressOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isPublishInProgress, setIsPublishInProgress] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [streamingText, setStreamingText] = useState("");
   const [paperPulse, setPaperPulse] = useState(false);
   const { filledCount, percentComplete, allFilled } = useSlotTracker(state);
+  const isDraftComplete =
+    state.slots != null &&
+    Object.values(state.slots).every((s) => s.status === "filled");
 
   const handlePublish = useCallback(async () => {
     if (state.path !== "policy" && state.path !== "product") return;
-    setIsPublishing(true);
+    setIsPublishInProgress(true);
     try {
       const formattedDocument = getFormattedDocumentText(state);
       const res = await fetch("/api/publish", {
@@ -196,15 +200,14 @@ export default function DraftPage() {
         console.error("Invalid publish response", data);
         throw new Error("Invalid publish response");
       }
-      // Only after confirmed success — do not log or redirect before write succeeds
       logEvent(sessionId, "draft_published", { path: state.path });
-      router.push("/feed");
+      setIsPublishInProgress(false);
+      setIsPublishing(true);
     } catch {
+      setIsPublishInProgress(false);
       toast.error("Publish failed. Please try again.");
-    } finally {
-      setIsPublishing(false);
     }
-  }, [state, sessionId, router]);
+  }, [state, sessionId]);
 
   const handleSubmit = useCallback(
     async (input: string) => {
@@ -323,6 +326,12 @@ export default function DraftPage() {
     return () => clearTimeout(t);
   }, [paperPulse]);
 
+  useEffect(() => {
+    if (!isPublishing) return;
+    const t = setTimeout(() => router.push("/feed"), 1500);
+    return () => clearTimeout(t);
+  }, [isPublishing, router]);
+
   return (
     <>
       <TopNav onInfoTap={() => setInfoOpen(true)} />
@@ -415,28 +424,26 @@ export default function DraftPage() {
             )}
           </div>
         )}
-        {allFilled && (
-          <div className="mt-3 mx-4 max-w-3xl md:mx-auto">
-            <PublishButton
-              allFilled={allFilled}
-              onPublish={handlePublish}
-              isPublishing={isPublishing}
-            />
-          </div>
-        )}
         {isSubmitting && (
           <p className="px-4 pt-1 text-sm text-[#1B2A4A]/70" role="status" aria-live="polite">
             Thinking…
           </p>
         )}
-        <InputField
-          onSubmit={handleSubmit}
-          disabled={isSubmitting}
-          placeholder={
-            messages.length > 0 ? "Enter your answer here" : undefined
-          }
-          label={messages.length > 0 ? "Your answer" : "Your idea"}
-        />
+        {isDraftComplete ? (
+          <CompletionPanel
+            onPublish={handlePublish}
+            isPublishing={isPublishInProgress || isPublishing}
+          />
+        ) : (
+          <InputField
+            onSubmit={handleSubmit}
+            disabled={isSubmitting}
+            placeholder={
+              messages.length > 0 ? "Enter your answer here" : undefined
+            }
+            label={messages.length > 0 ? "Your answer" : "Your idea"}
+          />
+        )}
       </div>
       <BottomNav variant="active" fixed={true} />
       <GoalTreeModal
@@ -453,6 +460,19 @@ export default function DraftPage() {
         path={state.path}
       />
       <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
+      {isPublishing && (
+        <div
+          className="publish-overlay-in fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#1B2A4A]"
+          role="status"
+          aria-live="polite"
+          aria-label="Draft published"
+        >
+          <p className="font-serif text-2xl text-white">Your draft is published.</p>
+          <p className="mt-2 font-sans text-sm text-white/60">
+            Redirecting to the public feed…
+          </p>
+        </div>
+      )}
     </>
   );
 }
