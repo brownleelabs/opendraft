@@ -53,7 +53,7 @@ export function ProgressBar({ slotsFilledCount, path }: ProgressBarProps) {
           </span>
         )}
       </div>
-      <span className="font-mono text-xs text-[#9CA3AF]">{percent}%</span>
+      <span className="hidden font-mono text-xs text-[#9CA3AF] md:inline">{percent}%</span>
     </div>
   );
 }

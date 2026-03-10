@@ -23,14 +23,14 @@ export default function Home() {
         <div className="flex items-center gap-3">
           <Link
             href="/feed"
-            className="font-sans text-sm font-semibold tracking-[0.15em] text-[#1B2A4A] no-underline hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
+            className="flex min-h-[44px] min-w-[44px] flex-shrink-0 items-center justify-center font-sans text-sm font-semibold tracking-[0.15em] text-[#1B2A4A] no-underline hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
           >
             FEED →
           </Link>
           <button
             type="button"
             onClick={() => setInfoOpen(true)}
-            className="flex size-7 flex-shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#1B2A4A] bg-transparent font-sans text-sm font-medium text-[#1B2A4A] transition-colors duration-150 hover:bg-[#1B2A4A] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
+            className="flex min-h-[44px] min-w-[44px] flex-shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#1B2A4A] bg-transparent font-sans text-sm font-medium text-[#1B2A4A] transition-colors duration-150 hover:bg-[#1B2A4A] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
             aria-label="Info"
           >
             ?
@@ -56,7 +56,7 @@ export default function Home() {
 
           {/* Paper card — animate-slide-up delay 0ms */}
           <div
-            className="animate-slide-up relative h-[200px] w-[min(600px,90vw)] rounded-[2px] border border-[#E8E3D8] bg-[#FAF8F3] p-5 opacity-0 shadow-[0_4px_24px_rgba(27,42,74,0.08),0_1px_4px_rgba(27,42,74,0.04)] md:h-[280px] md:p-[20px]"
+            className="animate-slide-up relative h-[200px] w-[min(600px,90vw)] overflow-hidden rounded-[2px] border border-[#E8E3D8] bg-[#FAF8F3] p-5 opacity-0 shadow-[0_4px_24px_rgba(27,42,74,0.08),0_1px_4px_rgba(27,42,74,0.04)] md:h-[280px] md:p-[20px]"
             style={{ animationDelay: "0ms", animationFillMode: "forwards" }}
             aria-hidden
           >
@@ -69,17 +69,17 @@ export default function Home() {
                   style={{ borderBottomWidth: "1px" }}
                 >
                   {i === 0 && (
-                    <span className="font-serif text-sm text-[#C8C0B0]">
+                    <span className="truncate font-serif text-sm text-[#C8C0B0]">
                       POLICY PROPOSAL — CITY OF CHICAGO
                     </span>
                   )}
                   {i === 2 && (
-                    <span className="font-serif text-sm text-[#C8C0B0]">
+                    <span className="truncate font-serif text-sm text-[#C8C0B0]">
                       Section 1. The following change is proposed...
                     </span>
                   )}
                   {i === 4 && (
-                    <span className="font-serif text-sm text-[#C8C0B0]">
+                    <span className="truncate font-serif text-sm text-[#C8C0B0]">
                       Whereas the current system fails to address...
                     </span>
                   )}
@@ -98,10 +98,10 @@ export default function Home() {
       </main>
 
       {/* ZONE 3 — BOTTOM — CTA animate-ink-in delay 250ms */}
-      <footer className="flex flex-shrink-0 flex-col items-center justify-center gap-3 pb-8 pt-4">
+      <footer className="flex w-full flex-shrink-0 flex-col items-center justify-center gap-3 px-4 pb-8 pt-4">
         <Link
           href="/draft"
-          className="animate-ink-in group inline-flex min-h-[44px] items-center justify-center border-0 bg-[#1B2A4A] px-12 py-4 font-sans text-sm font-semibold uppercase tracking-[0.1em] text-white no-underline opacity-0 transition-[background-color,transform] duration-200 hover:bg-[#2D5016] hover:[transform:skewX(-8deg)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3] active:scale-[0.98] [transform:skewX(-6deg)]"
+          className="animate-ink-in group inline-flex min-h-[44px] w-full max-w-[600px] items-center justify-center border-0 bg-[#1B2A4A] px-12 py-4 font-sans text-sm font-semibold uppercase tracking-[0.1em] text-white no-underline opacity-0 transition-[background-color,transform] duration-200 hover:bg-[#2D5016] hover:[transform:skewX(-8deg)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3] active:scale-[0.98] md:w-auto [transform:skewX(-6deg)]"
           style={{ animationDelay: "250ms", animationFillMode: "forwards" }}
         >
           <span className="inline-block skew-x-[6deg] transition-transform duration-200 group-hover:skew-x-[8deg]">CREATE A DRAFT</span>

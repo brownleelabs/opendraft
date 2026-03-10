@@ -77,7 +77,7 @@ export function InputField({
           onClick={handleSubmit}
           disabled={isEmpty || disabled}
           className={cn(
-            "flex h-12 shrink-0 items-center justify-center gap-2 rounded-[2px] bg-[#1B2A4A] px-4 text-white transition-transform duration-150 hover:enabled:scale-105 active:enabled:scale-[0.98] disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]",
+            "flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-2 rounded-[2px] bg-[#1B2A4A] px-4 py-3 text-white transition-transform duration-150 hover:enabled:scale-105 active:enabled:scale-[0.98] disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]",
             isSubmitting && "opacity-60"
           )}
           aria-label="Send"

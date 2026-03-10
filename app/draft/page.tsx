@@ -335,8 +335,10 @@ export default function DraftPage() {
   return (
     <>
       <TopNav onInfoTap={() => setInfoOpen(true)} />
-      {/* pt-20: clear fixed header + buffer below TopNav */}
-      <div className="pt-20 pb-14">
+      {/* pt-20: clear fixed header. On mobile when InputField shown: extra pb so fixed input doesn't overlap content. overflow-x-hidden: no horizontal scroll. */}
+      <div
+        className={`pt-20 overflow-x-hidden ${isDraftComplete ? "pb-14" : "pb-48 md:pb-14"}`}
+      >
         {filledCount > 0 && (
           <ProgressBar
             slotsFilledCount={filledCount}
@@ -435,15 +437,17 @@ export default function DraftPage() {
             isPublishing={isPublishInProgress || isPublishing}
           />
         ) : (
-          <InputField
-            onSubmit={handleSubmit}
-            disabled={isSubmitting}
-            isSubmitting={isSubmitting}
-            placeholder={
-              messages.length > 0 ? "Enter your answer here" : undefined
-            }
-            label={messages.length > 0 ? "Your answer" : "Your idea"}
-          />
+          <div className="fixed bottom-14 left-0 right-0 z-20 border-t border-[#E8E3D8] bg-[#FAF8F3] pb-[max(env(safe-area-inset-bottom),16px)] md:static md:border-t-0 md:pb-0">
+            <InputField
+              onSubmit={handleSubmit}
+              disabled={isSubmitting}
+              isSubmitting={isSubmitting}
+              placeholder={
+                messages.length > 0 ? "Enter your answer here" : undefined
+              }
+              label={messages.length > 0 ? "Your answer" : "Your idea"}
+            />
+          </div>
         )}
       </div>
       <BottomNav variant="active" fixed={true} />

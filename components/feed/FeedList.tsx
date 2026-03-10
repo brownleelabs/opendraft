@@ -93,7 +93,7 @@ export function FeedList({ drafts }: FeedListProps) {
   return (
     <div className="mx-auto max-w-2xl">
       <div className="sticky top-0 z-10 border-b border-[#E8E3D8] bg-white py-3">
-        <div className="flex flex-wrap justify-center gap-2 px-4">
+        <div className="flex flex-nowrap gap-2 overflow-x-auto px-4 scrollbar-none md:flex-wrap md:justify-center">
           {(["all", "policy", "product"] as const).map((f) => (
             <button
               key={f}
@@ -167,7 +167,7 @@ function EmptyState() {
       </p>
       <Link
         href="/draft"
-        className="mt-2 font-sans text-sm font-medium text-[#1B2A4A] underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
+        className="mt-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center font-sans text-sm font-medium text-[#1B2A4A] underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2A4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF8F3]"
       >
         Be the first. →
       </Link>

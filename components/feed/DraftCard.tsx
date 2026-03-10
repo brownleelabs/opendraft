@@ -48,7 +48,7 @@ export function DraftCard({
 
   return (
     <article
-      className="rounded-[2px] border border-[#E8E3D8] bg-white px-8 py-7 transition-[border-color,box-shadow] duration-150 hover:border-[#1B2A4A] hover:shadow-[0_4px_16px_rgba(27,42,74,0.06)]"
+      className="rounded-[2px] border border-[#E8E3D8] bg-white px-5 py-5 transition-[border-color,box-shadow] duration-150 hover:border-[#1B2A4A] hover:shadow-[0_4px_16px_rgba(27,42,74,0.06)] md:px-8 md:py-7"
       aria-labelledby={`draft-title-${id}`}
     >
       <div className="flex flex-row items-center justify-between gap-2">
@@ -77,7 +77,7 @@ export function DraftCard({
       )}
       <div className="mt-4 flex flex-row flex-wrap items-center justify-between gap-4 border-t border-[#F3F4F6] pt-4">
         <VoteButtons voteCount={voteCount} onVote={onVote} />
-        <span className="font-sans text-xs font-semibold uppercase tracking-wider text-[#1B2A4A]">
+        <span className="min-h-[44px] min-w-[44px] flex items-center justify-center font-sans text-xs font-semibold uppercase tracking-wider text-[#1B2A4A]">
           READ DRAFT →
         </span>
       </div>

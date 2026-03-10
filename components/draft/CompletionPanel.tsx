@@ -13,7 +13,7 @@ export interface CompletionPanelProps {
 
 export function CompletionPanel({ onPublish, isPublishing }: CompletionPanelProps) {
   return (
-    <div className="w-full border-t-2 border-[#1B2A4A] bg-white px-6 py-6">
+    <div className="w-full max-h-[40vh] overflow-y-auto border-t-2 border-[#1B2A4A] bg-white px-6 py-6">
       <p className="font-sans text-xs font-semibold uppercase tracking-[0.2em] text-[#2D5016]">
         ✦ DRAFT COMPLETE
       </p>
